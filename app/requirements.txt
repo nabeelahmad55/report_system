@@ -1,8 +1,7 @@
-# =============================
-# requirements.txt
-# =============================
 fastapi
 jinja2
-pandas
 weasyprint
-uvicorn
+uvicorn[standard]
+python-multipart
+sqlalchemy
+aiofiles

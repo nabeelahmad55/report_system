@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block title %}Report Generated{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 50px 20px;">
+    <h1 style="color: #28a745;">✅ Report Generated Successfully!</h1>
+    
+    <div style="background: #d4edda; padding: 30px; border-radius: 10px; margin: 30px auto; max-width: 600px;">
+        <h3>Report Details</h3>
+        <p><strong>Client:</strong> {{ client_name }}</p>
+        <p><strong>Report ID:</strong> {{ report_id }}</p>
+        <p><strong>PDF Path:</strong> {{ pdf_path }}</p>
+        
+        <div style="margin: 30px 0;">
+            <p>📧 Email has been queued for sending.</p>
+            <p>You can also download the report immediately:</p>
+        </div>
+        
+        <div style="margin-top: 30px;">
+            <a href="/reports/download/{{ report_id }}" class="btn" style="background: #007bff; padding: 12px 30px;">
+                📥 Download PDF
+            </a>
+            <a href="/reports/upload" class="btn" style="background: #28a745; padding: 12px 30px;">
+                ➕ Upload Another
+            </a>
+            <a href="/admin" class="btn" style="background: #6c757d; padding: 12px 30px;">
+                📊 Go to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <p style="color: #6c757d; margin-top: 30px;">
+        Check the console for email sending status. Email will be sent in the background.
+    </p>
+</div>
+{% endblock %}

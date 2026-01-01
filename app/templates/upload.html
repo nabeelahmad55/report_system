@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Upload CSV - Report System{% endblock %}
+
+{% block content %}
+<h2>📁 Upload CSV Files</h2>
+<p>Upload your CSV files to generate a PDF report.</p>
+
+<form action="/reports/generate" method="post" enctype="multipart/form-data">
+    
+    <div style="margin-bottom: 20px;">
+        <h3>Client Information</h3>
+        <input type="text" name="client_name" placeholder="Client Name" required style="padding: 8px; width: 300px; margin: 5px;"><br>
+        <input type="email" name="client_email" placeholder="Client Email" required style="padding: 8px; width: 300px; margin: 5px;">
+    </div>
+    
+    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+        <h3>📊 Main CSV (Required)</h3>
+        <input type="file" name="main_csv" accept=".csv" required>
+        <small>Format: date, total_appointments, completed_visits, cancelled_visits, consultation_revenue_usd, procedures_revenue_usd, lab_tests_revenue_usd</small>
+    </div>
+    
+    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+        <h3>💰 Service Line Revenue (Optional)</h3>
+        <input type="file" name="service_csv" accept=".csv">
+        <small>Format: service_line, revenue_usd, visits_count</small>
+    </div>
+    
+    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+        <h3>🏥 Insurance Claims (Optional)</h3>
+        <input type="file" name="claims_csv" accept=".csv">
+        <small>Format: payer, claims_submitted, claims_approved, pending_claims, approved_amount_usd, pending_amount_usd</small>
+    </div>
+    
+    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+        <h3>👨‍⚕️ Provider Performance (Optional)</h3>
+        <input type="file" name="provider_csv" accept=".csv">
+        <small>Format: provider_name, completed_visits, avg_visit_time_minutes, patient_satisfaction_score, revenue_usd</small>
+    </div>
+    
+    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
+        <h3>❌ Cancellation Reasons (Optional)</h3>
+        <input type="file" name="cancellation_csv" accept=".csv">
+        <small>Format: reason, count</small>
+    </div>
+    
+    <button type="submit" style="padding: 10px 30px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
+        Generate & Send Report
+    </button>
+</form>
+{% endblock %}

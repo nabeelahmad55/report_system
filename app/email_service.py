@@ -1,20 +1,16 @@
-import smtplib
-from email.message import EmailMessage
-
+import os
 
 def send_email(to_email, subject, body, pdf_path):
-msg = EmailMessage()
-msg['Subject'] = subject
-msg['From'] = "admin@example.com"
-msg['To'] = to_email
-msg.set_content(body)
-
-
-with open(pdf_path, 'rb') as f:
-msg.add_attachment(f.read(), maintype='application', subtype='pdf', filename='report.pdf')
-
-
-with smtplib.SMTP('smtp.gmail.com', 587) as server:
-server.starttls()
-server.login("nab.ahmad55@gmail.com", "APP_PASSWORD")
-server.send_message(msg)
+    """
+    Simplified email function for testing
+    In production, replace with actual SMTP code
+    """
+    print(f"[EMAIL] Would send to: {to_email}")
+    print(f"[EMAIL] Subject: {subject}")
+    print(f"[EMAIL] PDF Path: {pdf_path}")
+    
+    # Log to file
+    with open("email_log.txt", "a") as f:
+        f.write(f"To: {to_email}, Subject: {subject}, PDF: {pdf_path}\n")
+    
+    return True
