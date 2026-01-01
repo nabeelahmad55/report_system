@@ -1,0 +1,8 @@
+# =============================
+# requirements.txt
+# =============================
+fastapi
+jinja2
+pandas
+weasyprint
+uvicorn

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial; font-size: 12px; }
+        h2 { margin-top: 30px; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid #999;
+            padding: 6px;
+        }
+        .page-break {
+            page-break-before: always;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Clinic Report</h1>
+
+<h2>Appointments Summary</h2>
+<table>
+<tr>
+    <th>Date</th>
+    <th>Total</th>
+    <th>Completed</th>
+    <th>Cancelled</th>
+</tr>
+{% for r in main %}
+<tr>
+    <td>{{ r.date }}</td>
+    <td>{{ r.total_appointments }}</td>
+    <td>{{ r.completed_visits }}</td>
+    <td>{{ r.cancelled_visits }}</td>
+</tr>
+{% endfor %}
+</table>
+
+<div class="page-break"></div>
+
+<h2>Service Revenue</h2>
+<table>
+<tr>
+    <th>Service</th>
+    <th>Revenue</th>
+    <th>Visits</th>
+</tr>
+{% for r in service %}
+<tr>
+    <td>{{ r.service_line }}</td>
+    <td>{{ r.revenue_usd }}</td>
+    <td>{{ r.visits_count }}</td>
+</tr>
+{% endfor %}
+</table>
+
+</body>
+</html>
