@@ -37,19 +37,48 @@ def read_csv_file(file_path: str) -> List[Dict]:
     data = []
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
-            # Detect delimiter
-            sample = file.read(1024)
-            file.seek(0)
+            # Read the first line to check format
+            first_line = file.readline().strip()
+            file.seek(0)  # Reset to beginning
             
-            # Try to detect delimiter
-            delimiter = ',' if sample.count(',') > sample.count(';') else ';'
-            
-            reader = csv.DictReader(file, delimiter=delimiter)
-            for row in reader:
-                processed_row = {}
-                for key, value in row.items():
-                    processed_row[key.strip()] = parse_value(value.strip())
-                data.append(processed_row)
+            # Check if entire line is quoted (your format)
+            if first_line.startswith('"') and first_line.endswith('"'):
+                # Handle quoted CSV format
+                reader = csv.reader(file)
+                
+                # Read and clean headers (remove quotes)
+                headers_line = next(reader)[0]  # Get the quoted string
+                headers = [h.strip() for h in headers_line[1:-1].split(',')]  # Remove outer quotes and split
+                
+                # Read data rows
+                for row in reader:
+                    if row:  # Skip empty rows
+                        row_line = row[0]  # Get the quoted string
+                        values = [v.strip() for v in row_line[1:-1].split(',')]  # Remove outer quotes and split
+                        
+                        # Create dictionary
+                        processed_row = {}
+                        for i, header in enumerate(headers):
+                            if i < len(values):
+                                processed_row[header] = parse_value(values[i])
+                            else:
+                                processed_row[header] = None
+                        data.append(processed_row)
+            else:
+                # Normal CSV format (fields may be quoted, not entire lines)
+                # Detect delimiter
+                sample = file.read(1024)
+                file.seek(0)
+                
+                delimiter = ',' if sample.count(',') > sample.count(';') else ';'
+                
+                reader = csv.DictReader(file, delimiter=delimiter)
+                for row in reader:
+                    processed_row = {}
+                    for key, value in row.items():
+                        processed_row[key.strip()] = parse_value(value.strip())
+                    data.append(processed_row)
+                    
     except Exception as e:
         raise ValueError(f"Error reading CSV: {str(e)}")
     
