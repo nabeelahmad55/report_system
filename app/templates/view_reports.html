@@ -1,9 +1,1283 @@
 <!DOCTYPE html>
-<html>
-<head><title>Reports</title></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Reports List | Report System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --border-radius: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            font-size: 16px;
+            color: var(--dark);
+            padding-bottom: 20px;
+        }
+
+        /* Mobile Navigation */
+        .top-nav {
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            color: white;
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+        
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .nav-logo {
+            background: white;
+            color: #4361ee;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        
+        .nav-title {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .nav-title h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .nav-title p {
+            margin: 2px 0 0 0;
+            font-size: 11px;
+            opacity: 0.9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .mobile-menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 8px;
+            margin-left: auto;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+        
+        .nav-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 12px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 6px;
+            transition: all 0.3s;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        
+        .nav-link i {
+            font-size: 14px;
+        }
+        
+        .nav-link:hover, .nav-link:active {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-1px);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px;
+            width: 100%;
+        }
+
+        /* Header Section */
+        .page-header {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .header-left h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 8px;
+        }
+
+        .header-left p {
+            color: var(--gray);
+            font-size: 14px;
+        }
+
+        .stats-summary {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .count-badge {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+        }
+
+        /* Filters and Search */
+        .filters-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 44px;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: var(--light);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+            background: white;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+            font-size: 16px;
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 16px;
+            background: var(--light);
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            color: var(--dark);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        /* Reports Table - Desktop */
+        .reports-table {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            overflow: hidden;
+            margin-bottom: 24px;
+            display: none;
+        }
+
+        @media (min-width: 769px) {
+            .reports-table {
+                display: block;
+            }
+        }
+
+        .table-container {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        thead {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        th {
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        th i {
+            margin-right: 8px;
+            font-size: 12px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid var(--light-gray);
+            transition: all 0.3s;
+        }
+
+        tbody tr:hover {
+            background: var(--light);
+        }
+
+        td {
+            padding: 16px;
+            font-size: 14px;
+            vertical-align: middle;
+            color: var(--dark);
+        }
+
+        /* Status Badges */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            white-space: nowrap;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-failed {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .action-view {
+            background: var(--light);
+            color: var(--dark);
+            border: 1px solid var(--light-gray);
+        }
+
+        .action-edit {
+            background: #e8f4fd;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+
+        .action-delete {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .action-btn:hover, .action-btn:active {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .action-btn.action-view:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .action-btn.action-edit:hover {
+            background: #0369a1;
+            color: white;
+            border-color: #0369a1;
+        }
+
+        .action-btn.action-delete:hover {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+
+        /* Mobile Cards View */
+        .mobile-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 768px) {
+            .mobile-cards {
+                display: grid;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-cards {
+                display: none;
+            }
+        }
+
+        .report-card {
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            padding: 20px;
+            transition: all 0.3s;
+        }
+
+        .report-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .card-id {
+            font-size: 12px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .card-details {
+            margin-bottom: 16px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            font-size: 13px;
+            color: var(--gray);
+            font-weight: 500;
+        }
+
+        .detail-value {
+            font-size: 14px;
+            color: var(--dark);
+            font-weight: 500;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            margin-top: 24px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            color: var(--light-gray);
+            margin-bottom: 20px;
+        }
+
+        .empty-title {
+            font-size: 22px;
+            color: var(--dark);
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .empty-description {
+            color: var(--gray);
+            margin-bottom: 30px;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+            font-size: 15px;
+        }
+
+        /* Footer */
+        .admin-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--gray);
+            font-size: 14px;
+            padding: 20px;
+            border-top: 1px solid var(--light-gray);
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: var(--light);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+
+        /* Back Button */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: white;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            margin-top: 16px;
+        }
+
+        .back-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(67, 97, 238, 0.2);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .top-nav {
+                padding: 10px 12px;
+            }
+            
+            .mobile-menu-toggle {
+                display: block;
+            }
+            
+            .nav-links {
+                display: none;
+                width: 100%;
+                flex-direction: column;
+                gap: 8px;
+                margin-top: 12px;
+                padding-top: 12px;
+                border-top: 1px solid rgba(255,255,255,0.1);
+            }
+            
+            .nav-links.active {
+                display: flex;
+            }
+            
+            .nav-link {
+                width: 100%;
+                justify-content: flex-start;
+                padding: 12px;
+                font-size: 14px;
+            }
+            
+            .container {
+                padding: 12px;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                text-align: center;
+                padding: 16px;
+            }
+            
+            .stats-summary {
+                justify-content: center;
+            }
+            
+            .filters-section {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 16px;
+            }
+            
+            .search-box {
+                min-width: 100%;
+            }
+            
+            .filter-buttons {
+                justify-content: center;
+            }
+            
+            .mobile-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .report-card {
+                padding: 16px;
+            }
+            
+            .card-title {
+                font-size: 16px;
+            }
+            
+            .action-btn {
+                padding: 10px 14px;
+                font-size: 13px;
+                flex: 1;
+                justify-content: center;
+            }
+            
+            .empty-state {
+                padding: 40px 16px;
+            }
+            
+            .empty-icon {
+                font-size: 56px;
+            }
+            
+            .empty-title {
+                font-size: 20px;
+            }
+            
+            .back-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .nav-title h3 {
+                font-size: 14px;
+            }
+            
+            .nav-title p {
+                font-size: 10px;
+            }
+            
+            .header-left h1 {
+                font-size: 20px;
+            }
+            
+            .count-badge {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+            
+            .filter-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+            
+            .card-actions {
+                flex-direction: column;
+            }
+            
+            .action-btn {
+                width: 100%;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .mobile-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .filters-section {
+                flex-wrap: nowrap;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .action-btn:hover,
+            .filter-btn:hover,
+            .back-btn:hover,
+            .nav-link:hover {
+                transform: none;
+            }
+            
+            .report-card:hover {
+                transform: none;
+            }
+            
+            .action-btn.action-view:hover {
+                background: var(--light);
+                color: var(--dark);
+                border-color: var(--light-gray);
+            }
+            
+            .action-btn.action-edit:hover {
+                background: #e8f4fd;
+                color: #0369a1;
+                border-color: #bae6fd;
+            }
+            
+            .action-btn.action-delete:hover {
+                background: #fee2e2;
+                color: #dc2626;
+                border-color: #fecaca;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            }
+            
+            .page-header,
+            .filters-section,
+            .reports-table,
+            .report-card,
+            .empty-state {
+                background: #2d3748;
+                color: #e2e8f0;
+            }
+            
+            .header-left h1,
+            .card-title,
+            .detail-value,
+            th {
+                color: #e2e8f0;
+            }
+            
+            .header-left p,
+            .detail-label,
+            .card-id {
+                color: #a0aec0;
+            }
+            
+            .search-box input {
+                background: #4a5568;
+                border-color: #4a5568;
+                color: #e2e8f0;
+            }
+            
+            .search-box input:focus {
+                background: #4a5568;
+            }
+            
+            .filter-btn {
+                background: #4a5568;
+                border-color: #4a5568;
+                color: #e2e8f0;
+            }
+            
+            tbody tr:hover {
+                background: #4a5568;
+            }
+            
+            .back-btn {
+                background: #4a5568;
+                border-color: #4a5568;
+                color: #e2e8f0;
+            }
+            
+            .status-completed {
+                background: #234e52;
+                color: #81e6d9;
+            }
+            
+            .status-pending {
+                background: #744210;
+                color: #fbd38d;
+            }
+            
+            .status-failed {
+                background: #742a2a;
+                color: #fc8181;
+            }
+            
+            .action-view {
+                background: #4a5568;
+                border-color: #4a5568;
+                color: #e2e8f0;
+            }
+            
+            .action-edit {
+                background: #1e3a5f;
+                border-color: #1e3a5f;
+                color: #93c5fd;
+            }
+            
+            .action-delete {
+                background: #7f1d1d;
+                border-color: #7f1d1d;
+                color: #fca5a5;
+            }
+            
+            .version-badge {
+                background: #4a5568;
+            }
+        }
+    </style>
+</head>
 <body>
-    <h1>All Reports</h1>
-    <p>Total: {{ reports|length }}</p>
-    <a href="/admin/">Back to Admin</a>
+    <!-- Navigation Bar -->
+    <nav class="top-nav">
+        <div class="nav-left">
+            <div class="nav-logo">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="nav-title">
+                <h3>Report System</h3>
+                <p>Reports List</p>
+            </div>
+            <button class="mobile-menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+        <div class="nav-links" id="navLinks">
+            <a href="/admin" class="nav-link">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>
+            <a href="/reports/upload" class="nav-link">
+                <i class="fas fa-upload"></i> Upload CSV
+            </a>
+            <a href="/reports/list" class="nav-link active">
+                <i class="fas fa-file-alt"></i> View Reports
+            </a>
+            <a href="/reports/logout" class="nav-link">
+                <i class="fas fa-sign-out-alt"></i> Logout
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <div class="header-left">
+                <h1>All Generated Reports</h1>
+                <p>Browse and manage all generated PDF reports</p>
+            </div>
+            <div class="stats-summary">
+                <span class="count-badge">
+                    <i class="fas fa-file-alt"></i>
+                    {{ reports|length }} Reports
+                </span>
+            </div>
+        </div>
+
+        <!-- Filters and Search -->
+        <div class="filters-section">
+            <div class="search-box">
+                <i class="fas fa-search search-icon"></i>
+                <input type="text" id="searchInput" placeholder="Search reports...">
+            </div>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">
+                    <i class="fas fa-layer-group"></i> All
+                </button>
+                <button class="filter-btn" data-filter="completed">
+                    <i class="fas fa-check-circle"></i> Completed
+                </button>
+                <button class="filter-btn" data-filter="pending">
+                    <i class="fas fa-clock"></i> Pending
+                </button>
+                <button class="filter-btn" data-filter="failed">
+                    <i class="fas fa-exclamation-circle"></i> Failed
+                </button>
+            </div>
+        </div>
+
+        {% if reports %}
+            <!-- Desktop Table View -->
+            <div class="reports-table">
+                <div class="table-container">
+                    <table id="reportsTable">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-hashtag"></i> ID</th>
+                                <th><i class="fas fa-heading"></i> Title</th>
+                                <th><i class="fas fa-calendar"></i> Date Created</th>
+                                <th><i class="fas fa-info-circle"></i> Status</th>
+                                <th><i class="fas fa-cog"></i> Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for report in reports %}
+                            <tr data-status="{{ report.status|lower }}">
+                                <td>{{ report.id }}</td>
+                                <td>
+                                    <strong>{{ report.title }}</strong>
+                                    {% if report.client_name %}
+                                    <br><small class="detail-label">Client: {{ report.client_name }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {{ report.created_at }}
+                                    {% if report.completed_at %}
+                                    <br><small class="detail-label">Completed: {{ report.completed_at }}</small>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if report.status == 'completed' %}
+                                    <span class="status-badge status-completed">
+                                        <i class="fas fa-check-circle"></i> Completed
+                                    </span>
+                                    {% elif report.status == 'pending' %}
+                                    <span class="status-badge status-pending">
+                                        <i class="fas fa-clock"></i> Pending
+                                    </span>
+                                    {% else %}
+                                    <span class="status-badge status-failed">
+                                        <i class="fas fa-exclamation-circle"></i> Failed
+                                    </span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="action-buttons">
+                                        <a href="/report/{{ report.id }}" class="action-btn action-view" title="View Report">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        <a href="/report/{{ report.id }}/edit" class="action-btn action-edit" title="Edit Report">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="/report/{{ report.id }}/delete" class="action-btn action-delete" title="Delete Report">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Mobile Cards View -->
+            <div class="mobile-cards" id="mobileCards">
+                {% for report in reports %}
+                <div class="report-card" data-status="{{ report.status|lower }}">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-id">ID: {{ report.id }}</div>
+                            <h3 class="card-title">{{ report.title }}</h3>
+                        </div>
+                        {% if report.status == 'completed' %}
+                        <span class="status-badge status-completed">
+                            <i class="fas fa-check-circle"></i> Completed
+                        </span>
+                        {% elif report.status == 'pending' %}
+                        <span class="status-badge status-pending">
+                            <i class="fas fa-clock"></i> Pending
+                        </span>
+                        {% else %}
+                        <span class="status-badge status-failed">
+                            <i class="fas fa-exclamation-circle"></i> Failed
+                        </span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card-details">
+                        {% if report.client_name %}
+                        <div class="detail-row">
+                            <span class="detail-label">Client:</span>
+                            <span class="detail-value">{{ report.client_name }}</span>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="detail-row">
+                            <span class="detail-label">Created:</span>
+                            <span class="detail-value">{{ report.created_at }}</span>
+                        </div>
+                        
+                        {% if report.completed_at %}
+                        <div class="detail-row">
+                            <span class="detail-label">Completed:</span>
+                            <span class="detail-value">{{ report.completed_at }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="card-actions">
+                        <a href="/report/{{ report.id }}" class="action-btn action-view">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        <a href="/report/{{ report.id }}/edit" class="action-btn action-edit">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a href="/report/{{ report.id }}/delete" class="action-btn action-delete">
+                            <i class="fas fa-trash"></i> Delete
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <a href="/admin/" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Admin Dashboard
+            </a>
+
+        {% else %}
+            <!-- Empty State -->
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="far fa-folder-open"></i>
+                </div>
+                <h2 class="empty-title">No Reports Found</h2>
+                <p class="empty-description">
+                    There are no reports available at the moment. Start by uploading your first CSV file to generate a report.
+                </p>
+                <a href="/reports/upload" class="action-btn action-view" style="padding: 12px 24px; font-size: 16px;">
+                    <i class="fas fa-plus"></i> Generate First Report
+                </a>
+                <a href="/admin/" class="back-btn" style="margin-top: 16px;">
+                    <i class="fas fa-arrow-left"></i> Back to Dashboard
+                </a>
+            </div>
+        {% endif %}
+
+        <!-- Footer -->
+        <footer class="admin-footer">
+            <p>Medical Practice Report System &copy; 2023</p>
+            <div class="version-badge">v1.2.0</div>
+        </footer>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const navLinks = document.getElementById('navLinks');
+        
+        menuToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            navLinks.classList.toggle('active');
+            menuToggle.innerHTML = navLinks.classList.contains('active') 
+                ? '<i class="fas fa-times"></i>' 
+                : '<i class="fas fa-bars"></i>';
+        });
+        
+        // Close menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (window.innerWidth <= 768) {
+                if (!event.target.closest('.top-nav') && navLinks.classList.contains('active')) {
+                    navLinks.classList.remove('active');
+                    menuToggle.innerHTML = '<i class="fas fa-bars"></i>';
+                }
+            }
+        });
+
+        // Search functionality
+        const searchInput = document.getElementById('searchInput');
+        if (searchInput) {
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+                
+                // Filter table rows
+                document.querySelectorAll('#reportsTable tbody tr').forEach(row => {
+                    const text = row.textContent.toLowerCase();
+                    row.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+                
+                // Filter mobile cards
+                document.querySelectorAll('.report-card').forEach(card => {
+                    const text = card.textContent.toLowerCase();
+                    card.style.display = text.includes(searchTerm) ? '' : 'none';
+                });
+            });
+        }
+
+        // Filter functionality
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        filterButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // Remove active class from all buttons
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                // Add active class to clicked button
+                this.classList.add('active');
+                
+                const filter = this.dataset.filter;
+                
+                // Filter table rows
+                document.querySelectorAll('#reportsTable tbody tr').forEach(row => {
+                    if (filter === 'all') {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = row.dataset.status === filter ? '' : 'none';
+                    }
+                });
+                
+                // Filter mobile cards
+                document.querySelectorAll('.report-card').forEach(card => {
+                    if (filter === 'all') {
+                        card.style.display = '';
+                    } else {
+                        card.style.display = card.dataset.status === filter ? '' : 'none';
+                    }
+                });
+            });
+        });
+
+        // Touch device optimizations
+        if ('ontouchstart' in window) {
+            // Add touch feedback
+            document.querySelectorAll('.action-btn, .filter-btn, .nav-link, .back-btn').forEach(btn => {
+                btn.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.98)';
+                    this.style.opacity = '0.9';
+                });
+                
+                btn.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                    this.style.opacity = '';
+                });
+            });
+            
+            // Prevent zoom on double-tap
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', (event) => {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            
+            // Better scrolling for tables on mobile
+            document.querySelectorAll('.table-container').forEach(container => {
+                container.addEventListener('touchmove', function(e) {
+                    if (this.scrollWidth > this.clientWidth) {
+                        e.stopPropagation();
+                    }
+                }, { passive: true });
+            });
+        }
+
+        // Sort table functionality (optional enhancement)
+        const tableHeaders = document.querySelectorAll('#reportsTable th');
+        tableHeaders.forEach((header, index) => {
+            header.style.cursor = 'pointer';
+            header.addEventListener('click', () => {
+                sortTable(index);
+            });
+        });
+
+        function sortTable(column) {
+            const table = document.getElementById('reportsTable');
+            const tbody = table.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+            
+            const isAscending = table.dataset.sortColumn === String(column) && table.dataset.sortOrder === 'asc';
+            
+            rows.sort((a, b) => {
+                const aText = a.cells[column].textContent.trim();
+                const bText = b.cells[column].textContent.trim();
+                
+                // Try to parse as number first
+                const aNum = parseFloat(aText);
+                const bNum = parseFloat(bText);
+                
+                if (!isNaN(aNum) && !isNaN(bNum)) {
+                    return isAscending ? bNum - aNum : aNum - bNum;
+                }
+                
+                // Otherwise compare as strings
+                return isAscending 
+                    ? bText.localeCompare(aText)
+                    : aText.localeCompare(bText);
+            });
+            
+            // Clear and re-add sorted rows
+            rows.forEach(row => tbody.appendChild(row));
+            
+            // Update sort indicators
+            table.dataset.sortColumn = column;
+            table.dataset.sortOrder = isAscending ? 'desc' : 'asc';
+            
+            // Remove sort indicators from all headers
+            tableHeaders.forEach(h => h.innerHTML = h.innerHTML.replace(/ (↑|↓)/, ''));
+            
+            // Add sort indicator to current header
+            const indicator = isAscending ? ' ↓' : ' ↑';
+            tableHeaders[column].innerHTML += indicator;
+        }
+
+        // Auto-hide/show mobile/desktop views based on screen size
+        function updateViewVisibility() {
+            const isMobile = window.innerWidth <= 768;
+            const tableView = document.querySelector('.reports-table');
+            const cardsView = document.querySelector('.mobile-cards');
+            
+            if (isMobile) {
+                if (tableView) tableView.style.display = 'none';
+                if (cardsView) cardsView.style.display = 'grid';
+            } else {
+                if (tableView) tableView.style.display = 'block';
+                if (cardsView) cardsView.style.display = 'none';
+            }
+        }
+
+        // Initial call and resize listener
+        updateViewVisibility();
+        window.addEventListener('resize', updateViewVisibility);
+
+        // Initialize with some animations
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate cards on load
+            document.querySelectorAll('.report-card').forEach((card, index) => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                
+                setTimeout(() => {
+                    card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    card.style.opacity = '1';
+                    card.style.transform = 'translateY(0)';
+                }, index * 100);
+            });
+            
+            // Animate table rows
+            document.querySelectorAll('#reportsTable tbody tr').forEach((row, index) => {
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(-20px)';
+                
+                setTimeout(() => {
+                    row.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                    row.style.opacity = '1';
+                    row.style.transform = 'translateX(0)';
+                }, index * 50);
+            });
+        });
+    </script>
 </body>
 </html>

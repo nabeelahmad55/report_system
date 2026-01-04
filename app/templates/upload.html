@@ -1,51 +1,1465 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>Upload Report | Report System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --dark: #212529;
+            --light: #f8f9fa;
+            --gray: #6c757d;
+            --light-gray: #e9ecef;
+            --card-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --hover-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            --border-radius: 16px;
+            --transition: all 0.3s ease;
+        }
 
-{% block title %}Upload CSV - Report System{% endblock %}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
 
-{% block content %}
-<h2>📁 Upload CSV Files</h2>
-<p>Upload your CSV files to generate a PDF report.</p>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 0;
+            font-size: 16px;
+        }
 
-<form action="/reports/generate" method="post" enctype="multipart/form-data">
-    
-    <div style="margin-bottom: 20px;">
-        <h3>Client Information</h3>
-        <input type="text" name="client_name" placeholder="Client Name" required style="padding: 8px; width: 300px; margin: 5px;"><br>
-        <input type="email" name="client_email" placeholder="Client Email" required style="padding: 8px; width: 300px; margin: 5px;">
+        /* Top Navigation for Mobile */
+        .mobile-nav {
+            display: none;
+            background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+            color: white;
+            padding: 12px 16px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            width: 100%;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-content {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .nav-logo {
+            background: white;
+            color: #4361ee;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .nav-title {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .nav-title h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .nav-title p {
+            margin: 2px 0 0 0;
+            font-size: 11px;
+            opacity: 0.9;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .mobile-back-btn {
+            background: rgba(255,255,255,0.1);
+            border: none;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .mobile-back-btn:active {
+            transform: scale(0.95);
+        }
+
+        .upload-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0;
+            padding: 0 16px 40px;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .upload-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-top: 40px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            transition: var(--transition);
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: white;
+            border: 1px solid var(--light-gray);
+        }
+
+        .back-btn:active {
+            transform: scale(0.98);
+        }
+
+        .back-btn:hover {
+            color: var(--primary);
+            transform: translateX(-5px);
+            border-color: var(--primary);
+        }
+
+        .header-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 32px;
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        .header-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .header-subtitle {
+            color: var(--gray);
+            font-size: 16px;
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Upload Card */
+        .upload-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 40px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            margin-bottom: 30px;
+        }
+
+        .upload-card:hover {
+            box-shadow: var(--hover-shadow);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--light-gray);
+        }
+
+        .card-title i {
+            color: var(--primary);
+            font-size: 24px;
+        }
+
+        /* Upload Area */
+        .upload-area {
+            border: 3px dashed #d1d9e6;
+            border-radius: 12px;
+            padding: 60px 40px;
+            text-align: center;
+            background: var(--light);
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        .upload-area:active {
+            transform: scale(0.99);
+        }
+
+        .upload-area:hover, .upload-area.dragover {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .upload-area.dragover::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(67, 97, 238, 0.1);
+            z-index: 1;
+        }
+
+        .upload-icon {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            color: var(--primary);
+            font-size: 36px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: var(--transition);
+        }
+
+        .upload-area:hover .upload-icon {
+            transform: scale(1.1);
+            background: var(--primary);
+            color: white;
+        }
+
+        .upload-text h3 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 10px;
+            line-height: 1.3;
+        }
+
+        .upload-text p {
+            color: var(--gray);
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .browse-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 14px 32px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            font-size: 16px;
+            min-height: 48px;
+            min-width: 140px;
+        }
+
+        .browse-btn:active {
+            transform: scale(0.95);
+        }
+
+        .browse-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+        }
+
+        /* Selected File */
+        .selected-file {
+            display: none;
+            background: #f0f7ff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            text-align: left;
+            border-left: 4px solid var(--success);
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .file-icon {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--success);
+            font-size: 28px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            flex-shrink: 0;
+        }
+
+        .file-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-details h4 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 5px;
+            word-break: break-all;
+            line-height: 1.3;
+        }
+
+        .file-details p {
+            color: var(--gray);
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .file-size {
+            display: inline-block;
+            background: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .remove-file {
+            background: none;
+            border: none;
+            color: var(--danger);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: var(--transition);
+            flex-shrink: 0;
+            min-width: 44px;
+            min-height: 44px;
+        }
+
+        .remove-file:active {
+            transform: scale(0.9);
+        }
+
+        .remove-file:hover {
+            background: rgba(247, 37, 133, 0.1);
+        }
+
+        /* Requirements */
+        .requirements {
+            background: #fff9f0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .requirements h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 15px;
+        }
+
+        .requirements h4 i {
+            color: var(--warning);
+        }
+
+        .requirements ul {
+            list-style: none;
+            padding-left: 10px;
+        }
+
+        .requirements li {
+            color: var(--gray);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            line-height: 1.5;
+        }
+
+        .requirements li:before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .requirements code {
+            background: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+            color: var(--primary);
+            word-break: break-word;
+        }
+
+        /* Client Info Section */
+        .client-info {
+            background: #f8f9ff;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .client-info h4 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 20px;
+        }
+
+        .client-info h4 i {
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--light-gray);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: var(--transition);
+            background: white;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        .form-group .hint {
+            font-size: 12px;
+            color: var(--gray);
+            margin-top: 5px;
+            line-height: 1.4;
+        }
+
+        /* Submit Button */
+        .submit-section {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, var(--secondary), #8a2be2);
+            color: white;
+            padding: 18px 50px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 8px 20px rgba(114, 9, 183, 0.3);
+            min-height: 56px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .submit-btn:active:not(:disabled) {
+            transform: scale(0.98);
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(114, 9, 183, 0.4);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Footer */
+        .upload-footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--gray);
+            font-size: 13px;
+            padding: 0 16px;
+        }
+
+        /* Success/Error Messages */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        /* Mobile Responsive Breakpoints */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                align-items: stretch;
+            }
+
+            .mobile-nav {
+                display: block;
+            }
+
+            .upload-container {
+                padding: 0 16px 30px;
+                margin-top: 0;
+            }
+
+            .upload-header {
+                padding-top: 20px;
+                margin-bottom: 30px;
+            }
+
+            .back-btn {
+                display: none;
+            }
+
+            .header-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+                margin-bottom: 15px;
+            }
+
+            .header-title {
+                font-size: 26px;
+                margin-bottom: 8px;
+            }
+
+            .header-subtitle {
+                font-size: 14px;
+                line-height: 1.5;
+                padding: 0 10px;
+            }
+
+            .upload-card {
+                padding: 25px;
+                margin-bottom: 20px;
+                border-radius: 12px;
+            }
+
+            .card-title {
+                font-size: 18px;
+                margin-bottom: 20px;
+                padding-bottom: 12px;
+            }
+
+            .upload-area {
+                padding: 40px 20px;
+                margin-bottom: 20px;
+            }
+
+            .upload-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 28px;
+                margin-bottom: 20px;
+            }
+
+            .upload-text h3 {
+                font-size: 18px;
+                margin-bottom: 8px;
+            }
+
+            .upload-text p {
+                font-size: 14px;
+                margin-bottom: 20px;
+                padding: 0 10px;
+            }
+
+            .browse-btn {
+                padding: 12px 24px;
+                font-size: 15px;
+                min-width: 120px;
+            }
+
+            .selected-file {
+                padding: 20px;
+            }
+
+            .file-info {
+                gap: 15px;
+            }
+
+            .file-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+
+            .file-details h4 {
+                font-size: 16px;
+            }
+
+            .requirements,
+            .client-info {
+                padding: 20px;
+                margin-top: 20px;
+                margin-bottom: 20px;
+            }
+
+            .requirements li,
+            .form-group .hint {
+                font-size: 13px;
+            }
+
+            .form-group input {
+                padding: 12px 14px;
+                font-size: 15px;
+            }
+
+            .submit-btn {
+                padding: 16px 30px;
+                font-size: 16px;
+                width: 100%;
+                max-width: none;
+            }
+
+            .upload-footer {
+                font-size: 12px;
+                padding: 0 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .upload-header {
+                padding-top: 15px;
+                margin-bottom: 25px;
+            }
+
+            .header-title {
+                font-size: 24px;
+            }
+
+            .upload-card {
+                padding: 20px;
+            }
+
+            .upload-area {
+                padding: 30px 16px;
+            }
+
+            .upload-text h3 {
+                font-size: 17px;
+            }
+
+            .upload-text p {
+                font-size: 13px;
+            }
+
+            .file-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .remove-file {
+                align-self: flex-end;
+                margin-top: -40px;
+            }
+
+            .requirements li {
+                font-size: 12px;
+            }
+
+            .requirements code {
+                font-size: 11px;
+                padding: 1px 4px;
+            }
+
+            .client-info h4 {
+                font-size: 15px;
+            }
+
+            .form-group label {
+                font-size: 13px;
+            }
+
+            .form-group input {
+                font-size: 14px;
+                padding: 11px 12px;
+            }
+
+            .submit-btn {
+                padding: 14px 24px;
+                font-size: 15px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .header-title {
+                font-size: 22px;
+            }
+
+            .header-subtitle {
+                font-size: 13px;
+            }
+
+            .upload-card {
+                padding: 16px;
+            }
+
+            .upload-area {
+                padding: 25px 12px;
+            }
+
+            .upload-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+
+            .card-title {
+                font-size: 16px;
+                gap: 8px;
+            }
+
+            .card-title i {
+                font-size: 20px;
+            }
+
+            .browse-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+                min-width: 100px;
+            }
+        }
+
+        /* Tablet Optimizations */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .upload-container {
+                max-width: 700px;
+                padding: 40px 20px;
+            }
+
+            .upload-card {
+                padding: 35px;
+            }
+
+            .upload-area {
+                padding: 50px 30px;
+            }
+        }
+
+        /* Landscape Mode Optimizations */
+        @media (max-height: 600px) and (orientation: landscape) {
+            body {
+                align-items: flex-start;
+                padding: 20px 0;
+            }
+
+            .upload-container {
+                padding: 20px 16px;
+            }
+
+            .upload-header {
+                padding-top: 10px;
+                margin-bottom: 20px;
+            }
+
+            .header-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                margin-bottom: 10px;
+            }
+
+            .header-title {
+                font-size: 22px;
+                margin-bottom: 5px;
+            }
+
+            .header-subtitle {
+                font-size: 13px;
+                line-height: 1.4;
+            }
+
+            .upload-area {
+                padding: 30px 20px;
+            }
+
+            .upload-icon {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+                margin-bottom: 15px;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .back-btn:hover {
+                transform: none;
+            }
+
+            .browse-btn:hover,
+            .submit-btn:hover:not(:disabled) {
+                transform: none;
+                box-shadow: 0 8px 20px rgba(67, 97, 238, 0.3);
+            }
+
+            .upload-area:hover .upload-icon {
+                transform: none;
+                background: white;
+                color: var(--primary);
+            }
+
+            .upload-area:hover,
+            .upload-area.dragover {
+                transform: none;
+            }
+
+            .remove-file:hover {
+                background: none;
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            }
+
+            .upload-card,
+            .requirements,
+            .client-info,
+            .selected-file,
+            .back-btn {
+                background: #2d3748;
+                color: #e2e8f0;
+            }
+
+            .header-title,
+            .card-title,
+            .upload-text h3,
+            .file-details h4,
+            .client-info h4,
+            .requirements h4,
+            .form-group label {
+                color: #e2e8f0;
+            }
+
+            .header-subtitle,
+            .upload-text p,
+            .file-details p,
+            .form-group .hint,
+            .requirements li {
+                color: #a0aec0;
+            }
+
+            .upload-area {
+                background: #4a5568;
+                border-color: #4a5568;
+            }
+
+            .upload-icon {
+                background: #2d3748;
+                color: #63b3ed;
+            }
+
+            .file-icon {
+                background: #2d3748;
+                color: #68d391;
+            }
+
+            .file-size {
+                background: #4a5568;
+                color: #63b3ed;
+            }
+
+            .requirements {
+                background: #4a5568;
+                border-color: #d69e2e;
+            }
+
+            .requirements code {
+                background: #2d3748;
+                color: #63b3ed;
+            }
+
+            .client-info {
+                background: #4a5568;
+                border-color: #4299e1;
+            }
+
+            .form-group input {
+                background: #2d3748;
+                border-color: #4a5568;
+                color: #e2e8f0;
+            }
+
+            .form-group input:focus {
+                border-color: #63b3ed;
+                box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.1);
+            }
+
+            .selected-file {
+                background: #4a5568;
+                border-color: #68d391;
+            }
+
+            .alert-success {
+                background: #234e52;
+                color: #81e6d9;
+                border-color: #38b2ac;
+            }
+
+            .alert-error {
+                background: #742a2a;
+                color: #fc8181;
+                border-color: #f56565;
+            }
+
+            .back-btn {
+                border-color: #4a5568;
+            }
+
+            .back-btn:hover {
+                border-color: #63b3ed;
+            }
+        }
+
+        /* Prevent text size adjustment on iOS */
+        @supports (-webkit-touch-callout: none) {
+            body {
+                -webkit-text-size-adjust: 100%;
+            }
+            
+            .form-group input {
+                font-size: 16px !important; /* Prevents zoom on focus in iOS */
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav">
+        <div class="nav-content">
+            <a href="/admin" class="mobile-back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="nav-logo">
+                <i class="fas fa-chart-line"></i>
+            </div>
+            <div class="nav-title">
+                <h3>Upload Report</h3>
+                <p>Generate Professional PDF</p>
+            </div>
+        </div>
+    </nav>
+
+    <div class="upload-container">
+        <!-- Header -->
+        <div class="upload-header">
+            <a href="/admin" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <div class="header-icon">
+                <i class="fas fa-file-upload"></i>
+            </div>
+            <h1 class="header-title">Generate Professional Report</h1>
+            <p class="header-subtitle">
+                Upload your CSV data file to automatically generate a beautiful, professional report.
+                The system will process your data and create a ready-to-share PDF.
+            </p>
+        </div>
+
+        <!-- Upload Form -->
+        <form action="/reports/generate" method="POST" enctype="multipart/form-data" class="upload-card" id="uploadForm">
+            <!-- Error/Success Messages -->
+            <div id="errorAlert" class="alert alert-error" style="display: none;"></div>
+            <div id="successAlert" class="alert alert-success" style="display: none;"></div>
+
+            <div class="card-title">
+                <i class="fas fa-cloud-upload-alt"></i>
+                Main Data File (Required)
+            </div>
+
+            <!-- Upload Area -->
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">
+                    <i class="fas fa-file-csv"></i>
+                </div>
+                <div class="upload-text">
+                    <h3>Drag & Drop Your CSV File</h3>
+                    <p>Or tap to browse files on your device</p>
+                    <input type="file" name="main_csv" id="csvFile" class="file-input" accept=".csv" required>
+                    <label for="csvFile" class="browse-btn">
+                        <i class="fas fa-folder-open"></i> Browse Files
+                    </label>
+                </div>
+            </div>
+
+            <!-- Selected File Display -->
+            <div class="selected-file" id="selectedFile">
+                <div class="file-info">
+                    <div class="file-icon">
+                        <i class="fas fa-file-csv"></i>
+                    </div>
+                    <div class="file-details">
+                        <h4 id="fileName">example_data.csv</h4>
+                        <p>CSV File</p>
+                        <span class="file-size" id="fileSize">2.4 MB</span>
+                    </div>
+                    <button type="button" class="remove-file" id="removeFile" aria-label="Remove file">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Client Information Section -->
+            <div class="client-info">
+                <h4><i class="fas fa-user-md"></i> Client Information</h4>
+                
+                <div class="form-group">
+                    <label for="clientName">Client / Practice Name</label>
+                    <input type="text" id="clientName" name="client_name" 
+                           placeholder="e.g., City Medical Clinic" required
+                           autocapitalize="words" autocomplete="organization">
+                    <div class="hint">This will appear on the report cover page</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="clientEmail">Client Email</label>
+                    <input type="email" id="clientEmail" name="client_email" 
+                           placeholder="clinic@example.com" required
+                           inputmode="email" autocomplete="email">
+                    <div class="hint">Report will be sent to this email</div>
+                </div>
+                
+                <!-- Hidden Fields for Required Parameters -->
+                <input type="hidden" name="hide_branding" value="false">
+                <input type="hidden" name="save_as_template" value="false">
+            </div>
+
+            <!-- Requirements -->
+            <div class="requirements">
+                <h4><i class="fas fa-info-circle"></i> Required CSV Format</h4>
+                <ul>
+                    <li>File must be in CSV format with headers in the first row</li>
+                    <li>Required columns: <code>date</code>, <code>total_appointments</code>, <code>completed_visits</code>, <code>cancelled_visits</code></li>
+                    <li>Revenue columns: <code>consultation_revenue_usd</code>, <code>procedures_revenue_usd</code>, <code>lab_tests_revenue_usd</code></li>
+                    <li>Date format: YYYY-MM-DD (e.g., 2024-01-15)</li>
+                    <li>Maximum file size: 10MB</li>
+                </ul>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="submit-section">
+                <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                    <span id="btnText">Generate Report</span>
+                    <span id="btnIcon"><i class="fas fa-magic"></i></span>
+                    <div class="loading" id="loadingSpinner"></div>
+                </button>
+            </div>
+        </form>
+
+        <!-- Footer -->
+        <div class="upload-footer">
+            <p>© 2024 Report System. Supports CSV files up to 10MB.</p>
+        </div>
     </div>
-    
-    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
-        <h3>📊 Main CSV (Required)</h3>
-        <input type="file" name="main_csv" accept=".csv" required>
-        <small>Format: date, total_appointments, completed_visits, cancelled_visits, consultation_revenue_usd, procedures_revenue_usd, lab_tests_revenue_usd</small>
-    </div>
-    
-    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
-        <h3>💰 Service Line Revenue (Optional)</h3>
-        <input type="file" name="service_csv" accept=".csv">
-        <small>Format: service_line, revenue_usd, visits_count</small>
-    </div>
-    
-    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
-        <h3>🏥 Insurance Claims (Optional)</h3>
-        <input type="file" name="claims_csv" accept=".csv">
-        <small>Format: payer, claims_submitted, claims_approved, pending_claims, approved_amount_usd, pending_amount_usd</small>
-    </div>
-    
-    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
-        <h3>👨‍⚕️ Provider Performance (Optional)</h3>
-        <input type="file" name="provider_csv" accept=".csv">
-        <small>Format: provider_name, completed_visits, avg_visit_time_minutes, patient_satisfaction_score, revenue_usd</small>
-    </div>
-    
-    <div style="margin-bottom: 20px; padding: 15px; background: #f8f9fa; border-radius: 5px;">
-        <h3>❌ Cancellation Reasons (Optional)</h3>
-        <input type="file" name="cancellation_csv" accept=".csv">
-        <small>Format: reason, count</small>
-    </div>
-    
-    <button type="submit" style="padding: 10px 30px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">
-        Generate & Send Report
-    </button>
-</form>
-{% endblock %}
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Touch device detection
+            const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+            
+            if (isTouchDevice) {
+                document.body.classList.add('touch-device');
+            }
+
+            // Elements
+            const fileInput = document.getElementById('csvFile');
+            const uploadArea = document.getElementById('uploadArea');
+            const selectedFile = document.getElementById('selectedFile');
+            const fileName = document.getElementById('fileName');
+            const fileSize = document.getElementById('fileSize');
+            const removeFile = document.getElementById('removeFile');
+            const submitBtn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const uploadForm = document.getElementById('uploadForm');
+            const errorAlert = document.getElementById('errorAlert');
+            const successAlert = document.getElementById('successAlert');
+            const clientNameInput = document.getElementById('clientName');
+            const clientEmailInput = document.getElementById('clientEmail');
+
+            // Format file size
+            function formatFileSize(bytes) {
+                if (bytes === 0) return '0 Bytes';
+                const k = 1024;
+                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+                const i = Math.floor(Math.log(bytes) / Math.log(k));
+                return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+            }
+
+            // Display selected file
+            function displaySelectedFile(file) {
+                // Validate file size (10MB max)
+                if (file.size > 10 * 1024 * 1024) {
+                    showError('File size exceeds 10MB limit. Please upload a smaller file.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Validate file type
+                if (!file.name.toLowerCase().endsWith('.csv')) {
+                    showError('Only CSV files are allowed. Please select a CSV file.');
+                    fileInput.value = '';
+                    return;
+                }
+
+                fileName.textContent = file.name;
+                fileSize.textContent = formatFileSize(file.size);
+                selectedFile.style.display = 'block';
+                
+                updateSubmitButtonState();
+                
+                // Add success animation
+                uploadArea.style.borderColor = '#4cc9f0';
+                setTimeout(() => {
+                    uploadArea.style.borderColor = '';
+                }, 1000);
+            }
+
+            // Remove file
+            removeFile.addEventListener('click', function() {
+                fileInput.value = '';
+                selectedFile.style.display = 'none';
+                updateSubmitButtonState();
+            });
+
+            // Update submit button state
+            function updateSubmitButtonState() {
+                const hasFile = fileInput.files.length > 0;
+                const hasClientName = clientNameInput.value.trim() !== '';
+                const hasClientEmail = clientEmailInput.value.trim() !== '';
+                
+                submitBtn.disabled = !(hasFile && hasClientName && hasClientEmail);
+            }
+
+            // Validate email format
+            function isValidEmail(email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                return emailRegex.test(email);
+            }
+
+            // Show error message
+            function showError(message) {
+                errorAlert.textContent = message;
+                errorAlert.style.display = 'block';
+                successAlert.style.display = 'none';
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    errorAlert.style.display = 'none';
+                }, 5000);
+            }
+
+            // Show success message
+            function showSuccess(message) {
+                successAlert.textContent = message;
+                successAlert.style.display = 'block';
+                errorAlert.style.display = 'none';
+                
+                // Auto-hide after 3 seconds
+                setTimeout(() => {
+                    successAlert.style.display = 'none';
+                }, 3000);
+            }
+
+            // Validate form before submission
+            function validateForm() {
+                // Check file
+                if (!fileInput.files.length) {
+                    showError('Please select a CSV file to upload.');
+                    return false;
+                }
+
+                // Check client name
+                if (!clientNameInput.value.trim()) {
+                    showError('Please enter the client/practice name.');
+                    clientNameInput.focus();
+                    return false;
+                }
+
+                // Check client email
+                const email = clientEmailInput.value.trim();
+                if (!email) {
+                    showError('Please enter the client email.');
+                    clientEmailInput.focus();
+                    return false;
+                }
+
+                if (!isValidEmail(email)) {
+                    showError('Please enter a valid email address.');
+                    clientEmailInput.focus();
+                    return false;
+                }
+
+                // Check file size
+                const file = fileInput.files[0];
+                if (file.size > 10 * 1024 * 1024) {
+                    showError('File size exceeds 10MB limit. Please upload a smaller file.');
+                    return false;
+                }
+
+                return true;
+            }
+
+            // Event Listeners
+            fileInput.addEventListener('change', function(e) {
+                if (this.files.length > 0) {
+                    const file = this.files[0];
+                    displaySelectedFile(file);
+                }
+            });
+
+            clientNameInput.addEventListener('input', updateSubmitButtonState);
+            
+            clientEmailInput.addEventListener('input', function() {
+                updateSubmitButtonState();
+                
+                // Real-time email validation
+                if (this.value.trim() && !isValidEmail(this.value.trim())) {
+                    this.style.borderColor = 'var(--danger)';
+                } else {
+                    this.style.borderColor = '';
+                }
+            });
+
+            // Click upload area to trigger file input
+            uploadArea.addEventListener('click', function(e) {
+                // Don't trigger if clicking on browse button
+                if (!e.target.closest('.browse-btn')) {
+                    fileInput.click();
+                }
+            });
+
+            // Handle form submission
+            uploadForm.addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    return;
+                }
+                
+                // Show loading state
+                btnText.textContent = 'Generating Report...';
+                btnIcon.style.display = 'none';
+                loadingSpinner.style.display = 'block';
+                submitBtn.disabled = true;
+                
+                // Allow form to submit normally
+            });
+
+            // Handle drag and drop
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight() {
+                uploadArea.classList.add('dragover');
+            }
+
+            function unhighlight() {
+                uploadArea.classList.remove('dragover');
+            }
+
+            uploadArea.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length > 0) {
+                    fileInput.files = files;
+                    displaySelectedFile(files[0]);
+                }
+            }
+
+            // Initialize button state
+            updateSubmitButtonState();
+
+            // Prevent zoom on double-tap (mobile)
+            let lastTouchEnd = 0;
+            document.addEventListener('touchend', function(event) {
+                const now = Date.now();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+
+            // Fix for iOS form submission
+            if (/iPad|iPhone|iPod/.test(navigator.userAgent)) {
+                document.querySelectorAll('input, select, textarea').forEach(input => {
+                    input.addEventListener('focus', function() {
+                        window.scrollTo(0, 0);
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>

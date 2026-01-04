@@ -1,71 +1,616 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <title>Medical Report - {{ client_name }}</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            line-height: 1.6;
+        /* Base Styles & Reset */
+        :root {
+            --primary: #3498db;
+            --primary-dark: #2980b9;
+            --secondary: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --gray: #7f8c8d;
+            --light-gray: #bdc3c7;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
         }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background: #ffffff;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            font-size: 16px;
+        }
+
+        /* Print Styles */
+        @media print {
+            body {
+                padding: 0;
+                font-size: 12px;
+            }
+            
+            .section {
+                page-break-inside: avoid;
+                margin-bottom: 20px;
+            }
+            
+            .no-print {
+                display: none !important;
+            }
+            
+            .mobile-table-view {
+                display: none !important;
+            }
+        }
+
+        /* Header */
         .header {
             text-align: center;
-            border-bottom: 2px solid #333;
             padding-bottom: 20px;
             margin-bottom: 30px;
+            border-bottom: 2px solid var(--primary);
         }
-        .summary-box {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
+
+        .header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
-        .metric {
-            border: 1px solid #ddd;
-            padding: 15px;
-            border-radius: 5px;
-            text-align: center;
+
+        .header h3 {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 10px;
         }
-        .metric-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #2c3e50;
+
+        .header p {
+            color: var(--gray);
+            font-size: 14px;
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
+
+        /* Sections */
         .section {
             margin-bottom: 40px;
             page-break-inside: avoid;
         }
+
+        .section h2 {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--light);
+            position: relative;
+        }
+
+        .section h2:after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: var(--primary);
+        }
+
+        /* Summary Box - Responsive Grid */
+        .summary-box {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .metric {
+            background: white;
+            border: 1px solid var(--light);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            text-align: center;
+            transition: var(--transition);
+            box-shadow: var(--box-shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 120px;
+        }
+
+        .metric:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .metric > div:first-child {
+            font-size: 14px;
+            color: var(--gray);
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--dark);
+            line-height: 1.2;
+        }
+
+        /* Tables - Desktop View */
+        .desktop-table-view {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin: 20px 0;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--light);
+            box-shadow: var(--box-shadow);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-weight: 600;
+            text-align: left;
+            padding: 16px 12px;
+            font-size: 14px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th i {
+            margin-right: 8px;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+
+        td {
+            padding: 14px 12px;
+            border-bottom: 1px solid var(--light);
+            font-size: 14px;
+        }
+
+        tbody tr {
+            transition: background-color 0.2s ease;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
+        tbody tr:hover {
+            background-color: #f0f7ff;
+        }
+
+        .currency {
+            font-family: 'Courier New', monospace;
+            font-weight: 500;
+            color: var(--success);
+        }
+
+        .number {
+            font-family: 'Courier New', monospace;
+            font-weight: 500;
+        }
+
+        /* Mobile Cards View */
+        .mobile-table-view {
+            display: none;
+        }
+
+        .data-card {
+            background: white;
+            border: 1px solid var(--light);
+            border-radius: var(--border-radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--light-gray);
+        }
+
+        .card-title {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .card-body {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .card-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-label {
+            font-size: 12px;
+            color: var(--gray);
+            margin-bottom: 4px;
+        }
+
+        .card-value {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .card-value.currency {
+            color: var(--success);
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Footer */
         .footer {
             margin-top: 50px;
             padding-top: 20px;
-            border-top: 1px solid #ddd;
+            border-top: 1px solid var(--light);
             text-align: center;
             font-size: 12px;
-            color: #777;
+            color: var(--gray);
+        }
+
+        .footer p {
+            margin-bottom: 8px;
+        }
+
+        /* Action Buttons (for interactive reports) */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .action-btn {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .action-btn.secondary {
+            background: var(--light);
+            color: var(--dark);
+            border: 1px solid var(--light-gray);
+        }
+
+        .action-btn.secondary:hover {
+            background: #e0e0e0;
+        }
+
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--light-gray);
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+                font-size: 14px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .header h3 {
+                font-size: 18px;
+            }
+
+            .section h2 {
+                font-size: 20px;
+                margin-bottom: 16px;
+            }
+
+            .metric {
+                padding: 16px;
+                min-height: 100px;
+            }
+
+            .metric-value {
+                font-size: 24px;
+            }
+
+            .desktop-table-view {
+                display: none;
+            }
+
+            .mobile-table-view {
+                display: block;
+            }
+
+            .card-body {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .summary-box {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .section {
+                margin-bottom: 30px;
+            }
+
+            .section h2 {
+                font-size: 18px;
+            }
+
+            .metric-value {
+                font-size: 22px;
+            }
+
+            .card-body {
+                grid-template-columns: 1fr;
+            }
+
+            .data-card {
+                padding: 12px;
+            }
+
+            .footer {
+                margin-top: 30px;
+                padding-top: 16px;
+            }
+        }
+
+        @media (min-width: 769px) and (max-width: 1024px) {
+            body {
+                padding: 20px;
+            }
+
+            .summary-box {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            table {
+                min-width: 700px;
+            }
+        }
+
+        /* Landscape Mode Optimization */
+        @media (max-height: 600px) and (orientation: landscape) {
+            .section {
+                margin-bottom: 20px;
+            }
+
+            .metric {
+                padding: 12px;
+                min-height: 90px;
+            }
+
+            .metric-value {
+                font-size: 20px;
+            }
+        }
+
+        /* Touch Device Optimizations */
+        @media (hover: none) and (pointer: coarse) {
+            .metric:hover {
+                transform: none;
+                box-shadow: var(--box-shadow);
+            }
+
+            .action-btn:hover {
+                transform: none;
+                background: var(--primary);
+            }
+
+            .action-btn.secondary:hover {
+                background: var(--light);
+            }
+        }
+
+        /* Dark Mode Support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --primary: #3498db;
+                --primary-dark: #2980b9;
+                --secondary: #34495e;
+                --light: #2c3e50;
+                --dark: #ecf0f1;
+                --gray: #bdc3c7;
+                --light-gray: #34495e;
+            }
+
+            body {
+                background: #1a1a1a;
+                color: var(--dark);
+            }
+
+            .header h1 {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+
+            .metric {
+                background: #2c3e50;
+                border-color: #34495e;
+            }
+
+            .metric-value {
+                color: var(--dark);
+            }
+
+            .desktop-table-view {
+                border-color: #34495e;
+            }
+
+            th {
+                background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            }
+
+            td {
+                border-color: #34495e;
+                color: var(--dark);
+            }
+
+            tbody tr:nth-child(even) {
+                background-color: #2c3e50;
+            }
+
+            tbody tr:hover {
+                background-color: #34495e;
+            }
+
+            .data-card {
+                background: #2c3e50;
+                border-color: #34495e;
+            }
+
+            .card-title,
+            .card-value {
+                color: var(--dark);
+            }
+
+            .currency {
+                color: #2ecc71;
+            }
+
+            .footer {
+                border-color: #34495e;
+                color: var(--gray);
+            }
+
+            .action-btn.secondary {
+                background: #34495e;
+                color: var(--dark);
+                border-color: #2c3e50;
+            }
+
+            .action-btn.secondary:hover {
+                background: #2c3e50;
+            }
+        }
+
+        /* Print-specific overrides */
+        @media print {
+            .metric {
+                break-inside: avoid;
+            }
+
+            .summary-box {
+                grid-template-columns: repeat(2, 1fr) !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        /* Reduced motion preference */
+        @media (prefers-reduced-motion: reduce) {
+            * {
+                transition: none !important;
+                animation: none !important;
+            }
+            
+            .metric:hover {
+                transform: none !important;
+            }
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Header -->
     <div class="header">
         <h1>Medical Practice Report</h1>
         <h3>{{ client_name }}</h3>
         <p>Generated on: {{ generation_date }}</p>
     </div>
     
+    <!-- Executive Summary Section -->
     <div class="section">
         <h2>Executive Summary</h2>
         <div class="summary-box">
@@ -88,65 +633,328 @@
         </div>
     </div>
     
+    <!-- Daily Appointments Section -->
     {% if main_data %}
     <div class="section">
         <h2>Daily Appointments & Revenue</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Appointments</th>
-                    <th>Completed</th>
-                    <th>Cancelled</th>
-                    <th>Consultation</th>
-                    <th>Procedures</th>
-                    <th>Lab Tests</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in main_data %}
-                <tr>
-                    <td>{{ row.date }}</td>
-                    <td>{{ row.total_appointments }}</td>
-                    <td>{{ row.completed_visits }}</td>
-                    <td>{{ row.cancelled_visits }}</td>
-                    <td>${{ row.consultation_revenue_usd }}</td>
-                    <td>${{ row.procedures_revenue_usd }}</td>
-                    <td>${{ row.lab_tests_revenue_usd }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        
+        <!-- Desktop Table View -->
+        <div class="desktop-table-view">
+            <table>
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-calendar"></i> Date</th>
+                        <th><i class="fas fa-users"></i> Appointments</th>
+                        <th><i class="fas fa-check-circle"></i> Completed</th>
+                        <th><i class="fas fa-times-circle"></i> Cancelled</th>
+                        <th><i class="fas fa-stethoscope"></i> Consultation</th>
+                        <th><i class="fas fa-procedures"></i> Procedures</th>
+                        <th><i class="fas fa-vial"></i> Lab Tests</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in main_data %}
+                    <tr>
+                        <td>{{ row.date }}</td>
+                        <td class="number">{{ row.total_appointments }}</td>
+                        <td class="number">{{ row.completed_visits }}</td>
+                        <td class="number">{{ row.cancelled_visits }}</td>
+                        <td class="currency">${{ row.consultation_revenue_usd }}</td>
+                        <td class="currency">${{ row.procedures_revenue_usd }}</td>
+                        <td class="currency">${{ row.lab_tests_revenue_usd }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                {% if main_data %}
+                <tfoot>
+                    <tr style="background: #f8f9fa; font-weight: 600;">
+                        <td>Totals</td>
+                        <td class="number">{{ main_data|sum(attribute='total_appointments') }}</td>
+                        <td class="number">{{ main_data|sum(attribute='completed_visits') }}</td>
+                        <td class="number">{{ main_data|sum(attribute='cancelled_visits') }}</td>
+                        <td class="currency">${{ main_data|sum(attribute='consultation_revenue_usd') }}</td>
+                        <td class="currency">${{ main_data|sum(attribute='procedures_revenue_usd') }}</td>
+                        <td class="currency">${{ main_data|sum(attribute='lab_tests_revenue_usd') }}</td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+        
+        <!-- Mobile Cards View -->
+        <div class="mobile-table-view">
+            {% for row in main_data %}
+            <div class="data-card">
+                <div class="card-header">
+                    <div class="card-title">{{ row.date }}</div>
+                    <div class="card-value">{{ row.total_appointments }} Appts</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-item">
+                        <div class="card-label">Completed</div>
+                        <div class="card-value">{{ row.completed_visits }}</div>
+                    </div>
+                    <div class="card-item">
+                        <div class="card-label">Cancelled</div>
+                        <div class="card-value">{{ row.cancelled_visits }}</div>
+                    </div>
+                    <div class="card-item">
+                        <div class="card-label">Consultation</div>
+                        <div class="card-value currency">${{ row.consultation_revenue_usd }}</div>
+                    </div>
+                    <div class="card-item">
+                        <div class="card-label">Procedures</div>
+                        <div class="card-value currency">${{ row.procedures_revenue_usd }}</div>
+                    </div>
+                    <div class="card-item">
+                        <div class="card-label">Lab Tests</div>
+                        <div class="card-value currency">${{ row.lab_tests_revenue_usd }}</div>
+                    </div>
+                    <div class="card-item">
+                        <div class="card-label">Total</div>
+                        <div class="card-value currency">
+                            ${{
+                                (row.consultation_revenue_usd|default(0)|float) +
+                                (row.procedures_revenue_usd|default(0)|float) +
+                                (row.lab_tests_revenue_usd|default(0)|float)
+                            }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <div class="section">
+        <h2>Daily Appointments & Revenue</h2>
+        <div class="empty-state">
+            <i class="fas fa-database"></i>
+            <p>No appointment data available</p>
+        </div>
     </div>
     {% endif %}
     
+    <!-- Service Line Revenue Section -->
     {% if has_service_data %}
     <div class="section">
         <h2>Service Line Revenue</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Service Line</th>
-                    <th>Revenue</th>
-                    <th>Visits</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for row in service_data %}
-                <tr>
-                    <td>{{ row.service_line }}</td>
-                    <td>${{ row.revenue_usd }}</td>
-                    <td>{{ row.visits_count }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        
+        <!-- Desktop Table View -->
+        <div class="desktop-table-view">
+            <table>
+                <thead>
+                    <tr>
+                        <th><i class="fas fa-stethoscope"></i> Service Line</th>
+                        <th><i class="fas fa-dollar-sign"></i> Revenue</th>
+                        <th><i class="fas fa-user-check"></i> Visits</th>
+                        <th><i class="fas fa-chart-line"></i> Revenue/Visit</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in service_data %}
+                    <tr>
+                        <td>{{ row.service_line }}</td>
+                        <td class="currency">${{ row.revenue_usd }}</td>
+                        <td class="number">{{ row.visits_count }}</td>
+                        <td class="currency">
+                            {% if row.visits_count > 0 %}
+                                ${{ "{:.2f}".format(row.revenue_usd / row.visits_count) }}
+                            {% else %}
+                                $0.00
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                {% if service_data %}
+                <tfoot>
+                    <tr style="background: #f8f9fa; font-weight: 600;">
+                        <td>Total</td>
+                        <td class="currency">${{ service_data|sum(attribute='revenue_usd') }}</td>
+                        <td class="number">{{ service_data|sum(attribute='visits_count') }}</td>
+                        <td class="currency">
+                            {% set total_revenue = service_data|sum(attribute='revenue_usd') %}
+                            {% set total_visits = service_data|sum(attribute='visits_count') %}
+                            {% if total_visits > 0 %}
+                                ${{ "{:.2f}".format(total_revenue / total_visits) }}
+                            {% else %}
+                                $0.00
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+        </div>
+        
+        <!-- Mobile Cards View -->
+        <div class="mobile-table-view">
+            {% for row in service_data %}
+            <div class="data-card">
+                <div class="card-header">
+                    <div class="card-title">{{ row.service_line }}</div>
+                    <div class="card-value currency">${{ row.revenue_usd }}</div>
+                </div>
+                <div class="card-body">
+                    <div class="card-item">
+                        <div class="card-label">Visits</div>
+                        <div class="card-value">{{ row.visits_count }}</div>
+                    </div>
+                    <div class="card-item">
+                        <div class="card-label">Revenue/Visit</div>
+                        <div class="card-value currency">
+                            {% if row.visits_count > 0 %}
+                                ${{ "{:.2f}".format(row.revenue_usd / row.visits_count) }}
+                            {% else %}
+                                $0.00
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-item">
+                        <div class="card-label">Revenue Share</div>
+                        <div class="card-value">
+                            {% if service_data %}
+                                {% set total_revenue = service_data|sum(attribute='revenue_usd') %}
+                                {% if total_revenue > 0 %}
+                                    {{ "{:.1f}".format((row.revenue_usd / total_revenue) * 100) }}%
+                                {% else %}
+                                    0%
+                                {% endif %}
+                            {% else %}
+                                0%
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
     </div>
     {% endif %}
     
+    <!-- Footer -->
     <div class="footer">
         <p>Report generated by Medical Practice Reporting System</p>
         <p>Confidential - For authorized use only</p>
     </div>
+    
+    <!-- Action Buttons (Visible only on interactive devices) -->
+    <div class="action-buttons no-print">
+        <button class="action-btn" onclick="window.print()">
+            <i class="fas fa-print"></i> Print Report
+        </button>
+        <button class="action-btn secondary" id="toggleView">
+            <i class="fas fa-mobile-alt"></i> Toggle Mobile View
+        </button>
+        <button class="action-btn secondary" id="toggleDarkMode">
+            <i class="fas fa-moon"></i> Toggle Dark Mode
+        </button>
+    </div>
+
+    <script>
+        // Toggle between mobile and desktop view
+        document.getElementById('toggleView').addEventListener('click', function() {
+            const desktopTables = document.querySelectorAll('.desktop-table-view');
+            const mobileViews = document.querySelectorAll('.mobile-table-view');
+            
+            desktopTables.forEach(table => {
+                table.style.display = table.style.display === 'none' ? 'block' : 'none';
+            });
+            
+            mobileViews.forEach(view => {
+                view.style.display = view.style.display === 'none' ? 'block' : 'none';
+            });
+            
+            this.innerHTML = this.innerHTML.includes('Desktop') 
+                ? '<i class="fas fa-mobile-alt"></i> Mobile View' 
+                : '<i class="fas fa-desktop"></i> Desktop View';
+        });
+
+        // Dark mode toggle
+        document.getElementById('toggleDarkMode').addEventListener('click', function() {
+            const isDark = document.body.classList.toggle('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            
+            this.innerHTML = isDark
+                ? '<i class="fas fa-sun"></i> Light Mode'
+                : '<i class="fas fa-moon"></i> Dark Mode';
+        });
+
+        // Check for saved dark mode preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
+            document.getElementById('toggleDarkMode').innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+        }
+
+        // Handle window resize for auto-switching views
+        function handleResize() {
+            const width = window.innerWidth;
+            const desktopTables = document.querySelectorAll('.desktop-table-view');
+            const mobileViews = document.querySelectorAll('.mobile-table-view');
+            
+            if (width <= 768) {
+                // Mobile view
+                desktopTables.forEach(table => table.style.display = 'none');
+                mobileViews.forEach(view => view.style.display = 'block');
+            } else {
+                // Desktop view
+                desktopTables.forEach(table => table.style.display = 'block');
+                mobileViews.forEach(view => view.style.display = 'none');
+            }
+        }
+
+        // Initial call and resize listener
+        handleResize();
+        window.addEventListener('resize', handleResize);
+
+        // Add touch-friendly table scrolling
+        document.querySelectorAll('.desktop-table-view').forEach(table => {
+            table.addEventListener('touchstart', function(e) {
+                this.style.cursor = 'grabbing';
+            });
+            
+            table.addEventListener('touchend', function(e) {
+                this.style.cursor = 'grab';
+            });
+        });
+
+        // Prevent zoom on double-tap for mobile
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(event) {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Add some animation to metrics
+        document.querySelectorAll('.metric').forEach((metric, index) => {
+            metric.style.opacity = '0';
+            metric.style.transform = 'translateY(20px)';
+            
+            setTimeout(() => {
+                metric.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                metric.style.opacity = '1';
+                metric.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+
+        // Handle offline/online status
+        window.addEventListener('online', updateOnlineStatus);
+        window.addEventListener('offline', updateOnlineStatus);
+
+        function updateOnlineStatus() {
+            const status = navigator.onLine ? 'online' : 'offline';
+            console.log(`Report is ${status}`);
+        }
+
+        // Initialize tooltips for icons
+        document.querySelectorAll('th i').forEach(icon => {
+            const title = icon.parentElement.textContent.trim();
+            icon.setAttribute('title', title);
+        });
+    </script>
 </body>
 </html>
