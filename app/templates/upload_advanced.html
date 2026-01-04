@@ -1,0 +1,1283 @@
+<!-- Simplified version - Main CSV only visible by default -->
+<div class="card upload-card">
+    <div class="card-header">
+        <h5 class="card-title">
+            <i class="fas fa-file-csv card-icon"></i>
+            Upload Main CSV (Required)
+        </h5>
+        <div class="card-subtitle">Your primary appointment data file</div>
+    </div>
+    <div class="card-body">
+        <div class="upload-field">
+            <div class="file-input-wrapper">
+                <input type="file" class="file-input" name="main_csv" accept=".csv" required 
+                       id="mainCsvInput" aria-label="Main CSV file">
+                <div class="file-drop-area" id="mainCsvDropArea">
+                    <div class="file-drop-icon">
+                        <i class="fas fa-cloud-upload-alt"></i>
+                    </div>
+                    <div class="file-drop-text">
+                        <h6>Drag & drop your CSV file here</h6>
+                        <p>Or click to browse files</p>
+                    </div>
+                    <button type="button" class="browse-btn" onclick="document.getElementById('mainCsvInput').click()">
+                        <i class="fas fa-folder-open"></i> Browse Files
+                    </button>
+                </div>
+            </div>
+            <div class="selected-file-info" id="mainCsvFileInfo" style="display: none;">
+                <div class="file-info">
+                    <div class="file-icon">
+                        <i class="fas fa-file-csv"></i>
+                    </div>
+                    <div class="file-details">
+                        <div class="file-name" id="mainCsvFileName">No file selected</div>
+                        <div class="file-size" id="mainCsvFileSize">0 KB</div>
+                    </div>
+                    <button type="button" class="remove-file-btn" onclick="clearMainCsvFile()" aria-label="Remove file">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="upload-hint">
+                <i class="fas fa-info-circle"></i>
+                Upload your main appointment data CSV with required columns
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Advanced Options (Collapsed by default) -->
+<div class="card advanced-card">
+    <div class="card-header" id="advancedToggle" role="button" 
+         aria-expanded="false" aria-controls="advancedSection"
+         tabindex="0" onclick="toggleAdvancedSection()"
+         onkeypress="if(event.key === 'Enter' || event.key === ' ') toggleAdvancedSection()">
+        <div class="toggle-header">
+            <div class="toggle-icon">
+                <i class="fas fa-cog"></i>
+            </div>
+            <div class="toggle-content">
+                <h5 class="card-title">Advanced Options (Optional)</h5>
+                <div class="card-subtitle">Additional files and customization</div>
+            </div>
+            <div class="toggle-arrow">
+                <i class="fas fa-chevron-down"></i>
+            </div>
+        </div>
+    </div>
+    <div class="collapse-section" id="advancedSection" aria-hidden="true">
+        <div class="card-body">
+            <!-- Optional CSVs -->
+            <div class="optional-files">
+                <h6 class="section-title">
+                    <i class="fas fa-file-alt"></i> Additional Data Files
+                </h6>
+                <div class="section-description">
+                    Upload additional CSV files for more detailed analysis
+                </div>
+                
+                <!-- Service CSV -->
+                <div class="optional-file-group">
+                    <div class="optional-file-label">
+                        <label for="serviceCsvInput">Service Line Revenue CSV</label>
+                        <span class="optional-badge">Optional</span>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <input type="file" class="file-input" name="service_csv" accept=".csv" 
+                               id="serviceCsvInput" aria-label="Service CSV file">
+                        <div class="file-drop-area compact" onclick="document.getElementById('serviceCsvInput').click()">
+                            <div class="file-drop-icon">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="file-drop-text">
+                                <p>Add service revenue data</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="selected-file-info" id="serviceCsvFileInfo" style="display: none;">
+                        <div class="file-info">
+                            <div class="file-icon">
+                                <i class="fas fa-file-csv"></i>
+                            </div>
+                            <div class="file-details">
+                                <div class="file-name" id="serviceCsvFileName">No file selected</div>
+                                <div class="file-size" id="serviceCsvFileSize">0 KB</div>
+                            </div>
+                            <button type="button" class="remove-file-btn" onclick="clearServiceCsvFile()" aria-label="Remove file">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Claims CSV -->
+                <div class="optional-file-group">
+                    <div class="optional-file-label">
+                        <label for="claimsCsvInput">Insurance Claims CSV</label>
+                        <span class="optional-badge">Optional</span>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <input type="file" class="file-input" name="claims_csv" accept=".csv" 
+                               id="claimsCsvInput" aria-label="Claims CSV file">
+                        <div class="file-drop-area compact" onclick="document.getElementById('claimsCsvInput').click()">
+                            <div class="file-drop-icon">
+                                <i class="fas fa-plus"></i>
+                            </div>
+                            <div class="file-drop-text">
+                                <p>Add insurance claims data</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="selected-file-info" id="claimsCsvFileInfo" style="display: none;">
+                        <div class="file-info">
+                            <div class="file-icon">
+                                <i class="fas fa-file-csv"></i>
+                            </div>
+                            <div class="file-details">
+                                <div class="file-name" id="claimsCsvFileName">No file selected</div>
+                                <div class="file-size" id="claimsCsvFileSize">0 KB</div>
+                            </div>
+                            <button type="button" class="remove-file-btn" onclick="clearClaimsCsvFile()" aria-label="Remove file">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- More optional files can be added here -->
+            </div>
+
+            <!-- White-label Options -->
+            <div class="section-divider"></div>
+            <div class="branding-options">
+                <h6 class="section-title">
+                    <i class="fas fa-palette"></i> Branding Options
+                </h6>
+                
+                <div class="toggle-option">
+                    <input type="checkbox" class="toggle-checkbox" name="hide_branding" id="hideBranding">
+                    <label for="hideBranding" class="toggle-label">
+                        <div class="toggle-content">
+                            <div class="toggle-icon">
+                                <i class="fas fa-eye-slash"></i>
+                            </div>
+                            <div class="toggle-text">
+                                <div class="toggle-title">Hide system branding</div>
+                                <div class="toggle-description">Remove Report System branding from the PDF</div>
+                            </div>
+                        </div>
+                        <div class="toggle-switch">
+                            <span class="toggle-switch-slider"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- Logo Upload -->
+                <div class="logo-upload">
+                    <div class="logo-upload-label">
+                        <label for="logoInput">Upload Logo (Optional)</label>
+                        <span class="optional-badge">Optional</span>
+                    </div>
+                    <div class="file-input-wrapper">
+                        <input type="file" class="file-input" name="logo" accept=".png,.jpg,.jpeg,.svg" 
+                               id="logoInput" aria-label="Logo file">
+                        <div class="file-drop-area logo-upload-area" onclick="document.getElementById('logoInput').click()">
+                            <div class="logo-upload-icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="logo-upload-text">
+                                <p>Upload your logo (PNG, JPG, SVG)</p>
+                                <small>Recommended: 300x100px transparent PNG</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="selected-file-info" id="logoFileInfo" style="display: none;">
+                        <div class="file-info">
+                            <div class="file-icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <div class="file-details">
+                                <div class="file-name" id="logoFileName">No logo selected</div>
+                                <div class="file-size" id="logoFileSize">0 KB</div>
+                            </div>
+                            <button type="button" class="remove-file-btn" onclick="clearLogoFile()" aria-label="Remove logo">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Save as Template -->
+            <div class="section-divider"></div>
+            <div class="template-options">
+                <h6 class="section-title">
+                    <i class="fas fa-save"></i> Save Settings
+                </h6>
+                
+                <div class="toggle-option">
+                    <input type="checkbox" class="toggle-checkbox" name="save_as_template" id="saveTemplate">
+                    <label for="saveTemplate" class="toggle-label">
+                        <div class="toggle-content">
+                            <div class="toggle-icon">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div class="toggle-text">
+                                <div class="toggle-title">Save as template</div>
+                                <div class="toggle-description">Save these settings for future use</div>
+                            </div>
+                        </div>
+                        <div class="toggle-switch">
+                            <span class="toggle-switch-slider"></span>
+                        </div>
+                    </label>
+                </div>
+
+                <div class="template-name-section" id="templateNameSection" style="display: none;">
+                    <div class="form-group">
+                        <label for="templateName">Template Name</label>
+                        <input type="text" class="form-control" name="template_name" 
+                               id="templateName" placeholder="e.g., Monthly Clinic Report"
+                               aria-label="Template name">
+                        <div class="form-hint">
+                            Give your template a descriptive name
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Variables */
+    :root {
+        --primary: #4361ee;
+        --primary-light: #e8f4fd;
+        --secondary: #7209b7;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --dark: #1e293b;
+        --gray: #64748b;
+        --light-gray: #e2e8f0;
+        --lighter-gray: #f8fafc;
+        --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --border-radius: 12px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Base Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .upload-card,
+    .advanced-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        border: 1px solid var(--light-gray);
+        transition: var(--transition);
+        margin-bottom: 20px;
+        overflow: hidden;
+    }
+
+    .upload-card:hover,
+    .advanced-card:hover {
+        box-shadow: var(--hover-shadow);
+    }
+
+    /* Card Header */
+    .card-header {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+        color: white;
+        padding: 20px;
+        border-bottom: 1px solid var(--light-gray);
+        cursor: pointer;
+        user-select: none;
+        transition: var(--transition);
+    }
+
+    .upload-card .card-header {
+        background: linear-gradient(135deg, var(--primary) 0%, #3a56d4 100%);
+    }
+
+    .card-header:hover {
+        background: linear-gradient(135deg, #3a56d4 0%, #2e46b4 100%);
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-subtitle {
+        font-size: 14px;
+        opacity: 0.9;
+    }
+
+    .card-icon {
+        font-size: 20px;
+    }
+
+    /* Toggle Header */
+    .toggle-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .toggle-icon {
+        width: 40px;
+        height: 40px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .toggle-content {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .toggle-arrow {
+        transition: var(--transition);
+        font-size: 14px;
+    }
+
+    /* Card Body */
+    .card-body {
+        padding: 25px;
+    }
+
+    /* Upload Field */
+    .upload-field {
+        position: relative;
+    }
+
+    .file-input-wrapper {
+        position: relative;
+    }
+
+    .file-input {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        border: 0;
+    }
+
+    .file-drop-area {
+        border: 3px dashed var(--light-gray);
+        border-radius: 10px;
+        padding: 40px 30px;
+        text-align: center;
+        background: var(--lighter-gray);
+        transition: var(--transition);
+        cursor: pointer;
+    }
+
+    .file-drop-area:hover,
+    .file-drop-area.dragover {
+        border-color: var(--primary);
+        background: rgba(67, 97, 238, 0.05);
+    }
+
+    .file-drop-area.compact {
+        padding: 20px;
+        text-align: left;
+    }
+
+    .file-drop-icon {
+        width: 60px;
+        height: 60px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        color: var(--primary);
+        font-size: 24px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: var(--transition);
+    }
+
+    .file-drop-area:hover .file-drop-icon {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+    }
+
+    .file-drop-text h6 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 8px;
+    }
+
+    .file-drop-text p {
+        color: var(--gray);
+        margin-bottom: 20px;
+        font-size: 14px;
+    }
+
+    .file-drop-area.compact .file-drop-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 16px;
+        margin: 0 12px 0 0;
+        display: inline-flex;
+    }
+
+    .file-drop-area.compact .file-drop-text {
+        display: inline-flex;
+        align-items: center;
+        margin: 0;
+    }
+
+    /* Browse Button */
+    .browse-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, var(--primary), #3a56d4);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        border: none;
+        cursor: pointer;
+        transition: var(--transition);
+        min-height: 44px;
+        min-width: 120px;
+    }
+
+    .browse-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 16px rgba(67, 97, 238, 0.3);
+    }
+
+    /* Selected File Info */
+    .selected-file-info {
+        margin-top: 20px;
+        animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .file-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background: var(--primary-light);
+        border-radius: 10px;
+        padding: 15px;
+        border-left: 4px solid var(--success);
+    }
+
+    .file-icon {
+        width: 40px;
+        height: 40px;
+        background: white;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--success);
+        font-size: 18px;
+        flex-shrink: 0;
+    }
+
+    .file-details {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .file-name {
+        font-weight: 500;
+        color: var(--dark);
+        margin-bottom: 4px;
+        word-break: break-all;
+        font-size: 14px;
+    }
+
+    .file-size {
+        font-size: 12px;
+        color: var(--gray);
+    }
+
+    .remove-file-btn {
+        background: none;
+        border: none;
+        color: var(--danger);
+        font-size: 16px;
+        cursor: pointer;
+        padding: 8px;
+        border-radius: 6px;
+        transition: var(--transition);
+        flex-shrink: 0;
+        min-width: 40px;
+        min-height: 40px;
+    }
+
+    .remove-file-btn:hover {
+        background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Upload Hint */
+    .upload-hint {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 12px;
+        color: var(--gray);
+        font-size: 13px;
+    }
+
+    .upload-hint i {
+        color: var(--primary);
+    }
+
+    /* Optional Files */
+    .optional-files {
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--dark);
+        margin-bottom: 8px;
+    }
+
+    .section-title i {
+        color: var(--primary);
+    }
+
+    .section-description {
+        color: var(--gray);
+        font-size: 13px;
+        margin-bottom: 20px;
+    }
+
+    .optional-file-group {
+        margin-bottom: 20px;
+    }
+
+    .optional-file-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    .optional-file-label label {
+        font-weight: 500;
+        color: var(--dark);
+        font-size: 14px;
+    }
+
+    .optional-badge {
+        background: var(--light-gray);
+        color: var(--gray);
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 500;
+    }
+
+    /* Section Divider */
+    .section-divider {
+        height: 1px;
+        background: var(--light-gray);
+        margin: 30px 0;
+    }
+
+    /* Branding Options */
+    .branding-options,
+    .template-options {
+        margin-bottom: 20px;
+    }
+
+    /* Toggle Option */
+    .toggle-option {
+        margin-bottom: 20px;
+    }
+
+    .toggle-checkbox {
+        display: none;
+    }
+
+    .toggle-label {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px;
+        background: var(--lighter-gray);
+        border-radius: 10px;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 1px solid transparent;
+    }
+
+    .toggle-label:hover {
+        border-color: var(--primary);
+        background: white;
+    }
+
+    .toggle-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+    }
+
+    .toggle-text {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .toggle-title {
+        font-weight: 500;
+        color: var(--dark);
+        margin-bottom: 4px;
+        font-size: 14px;
+    }
+
+    .toggle-description {
+        color: var(--gray);
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .toggle-switch {
+        position: relative;
+        width: 50px;
+        height: 26px;
+        background: var(--light-gray);
+        border-radius: 13px;
+        transition: var(--transition);
+    }
+
+    .toggle-switch-slider {
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 20px;
+        height: 20px;
+        background: white;
+        border-radius: 50%;
+        transition: var(--transition);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .toggle-checkbox:checked + .toggle-label .toggle-switch {
+        background: var(--success);
+    }
+
+    .toggle-checkbox:checked + .toggle-label .toggle-switch-slider {
+        transform: translateX(24px);
+    }
+
+    /* Logo Upload */
+    .logo-upload-label {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+
+    .logo-upload-area {
+        padding: 30px;
+        border-style: dotted;
+    }
+
+    .logo-upload-icon {
+        width: 50px;
+        height: 50px;
+        background: var(--primary-light);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        color: var(--primary);
+        font-size: 20px;
+    }
+
+    .logo-upload-text p {
+        margin-bottom: 6px;
+    }
+
+    .logo-upload-text small {
+        color: var(--gray);
+        font-size: 12px;
+    }
+
+    /* Template Name */
+    .template-name-section {
+        margin-top: 20px;
+        animation: slideUp 0.3s ease;
+    }
+
+    .form-group {
+        margin-bottom: 0;
+    }
+
+    .form-group label {
+        display: block;
+        font-weight: 500;
+        color: var(--dark);
+        margin-bottom: 8px;
+        font-size: 14px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 16px;
+        border: 2px solid var(--light-gray);
+        border-radius: 8px;
+        font-size: 14px;
+        transition: var(--transition);
+        background: white;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+    }
+
+    .form-hint {
+        color: var(--gray);
+        font-size: 12px;
+        margin-top: 6px;
+    }
+
+    /* Collapse Section */
+    .collapse-section {
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .collapse-section.expanded {
+        max-height: 2000px;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .upload-card,
+        .advanced-card {
+            margin-bottom: 16px;
+            border-radius: 10px;
+        }
+
+        .card-header {
+            padding: 16px;
+        }
+
+        .card-title {
+            font-size: 16px;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .file-drop-area {
+            padding: 30px 20px;
+        }
+
+        .file-drop-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            margin-bottom: 16px;
+        }
+
+        .file-drop-text h6 {
+            font-size: 16px;
+        }
+
+        .file-drop-text p {
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+
+        .browse-btn {
+            padding: 10px 20px;
+            font-size: 13px;
+            min-width: 110px;
+        }
+
+        .file-info {
+            padding: 12px;
+            gap: 12px;
+        }
+
+        .file-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
+        }
+
+        .file-name {
+            font-size: 13px;
+        }
+
+        .file-size {
+            font-size: 11px;
+        }
+
+        .remove-file-btn {
+            min-width: 36px;
+            min-height: 36px;
+        }
+
+        .optional-file-group {
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 15px;
+        }
+
+        .section-description {
+            font-size: 12px;
+        }
+
+        .toggle-label {
+            padding: 14px;
+        }
+
+        .toggle-title {
+            font-size: 13px;
+        }
+
+        .toggle-description {
+            font-size: 11px;
+        }
+
+        .logo-upload-area {
+            padding: 20px;
+        }
+
+        .logo-upload-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .form-control {
+            padding: 10px 14px;
+            font-size: 13px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .card-header {
+            padding: 14px;
+        }
+
+        .card-title {
+            font-size: 15px;
+        }
+
+        .toggle-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 16px;
+        }
+
+        .card-body {
+            padding: 16px;
+        }
+
+        .file-drop-area {
+            padding: 24px 16px;
+        }
+
+        .file-drop-area.compact {
+            padding: 16px;
+        }
+
+        .file-drop-text h6 {
+            font-size: 15px;
+        }
+
+        .file-drop-text p {
+            font-size: 12px;
+        }
+
+        .browse-btn {
+            padding: 10px 16px;
+            font-size: 12px;
+            min-width: 100px;
+        }
+
+        .file-info {
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .file-details {
+            flex: 1 0 60%;
+        }
+
+        .remove-file-btn {
+            order: 3;
+            margin-left: auto;
+        }
+
+        .toggle-header {
+            gap: 10px;
+        }
+
+        .toggle-content {
+            gap: 10px;
+        }
+
+        .section-divider {
+            margin: 24px 0;
+        }
+
+        .logo-upload-area {
+            padding: 16px;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .card-title {
+            font-size: 14px;
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+        }
+
+        .file-drop-area {
+            padding: 20px 12px;
+        }
+
+        .file-drop-icon {
+            width: 44px;
+            height: 44px;
+            font-size: 18px;
+        }
+
+        .browse-btn {
+            padding: 8px 14px;
+            font-size: 11px;
+            min-width: 90px;
+        }
+
+        .toggle-switch {
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch-slider {
+            width: 18px;
+            height: 18px;
+        }
+
+        .toggle-checkbox:checked + .toggle-label .toggle-switch-slider {
+            transform: translateX(20px);
+        }
+    }
+
+    /* Tablet Optimizations */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .upload-card,
+        .advanced-card {
+            margin-bottom: 24px;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+    }
+
+    /* Landscape Mode */
+    @media (max-height: 600px) and (orientation: landscape) {
+        .file-drop-area {
+            padding: 20px;
+        }
+
+        .file-drop-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 18px;
+            margin-bottom: 12px;
+        }
+
+        .file-drop-text h6 {
+            font-size: 15px;
+            margin-bottom: 4px;
+        }
+
+        .file-drop-text p {
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+    }
+
+    /* Touch Device Optimizations */
+    @media (hover: none) and (pointer: coarse) {
+        .browse-btn:hover,
+        .file-drop-area:hover {
+            transform: none;
+        }
+
+        .file-drop-area:hover .file-drop-icon {
+            transform: none;
+        }
+
+        .toggle-label:hover {
+            border-color: transparent;
+            background: var(--lighter-gray);
+        }
+
+        .remove-file-btn:hover {
+            background: none;
+        }
+    }
+
+    /* Dark Mode Support */
+    @media (prefers-color-scheme: dark) {
+        :root {
+            --dark: #f8fafc;
+            --gray: #cbd5e1;
+            --light-gray: #475569;
+            --lighter-gray: #1e293b;
+            --primary-light: #1e3a5f;
+        }
+
+        .upload-card,
+        .advanced-card {
+            background: #1e293b;
+            border-color: #334155;
+        }
+
+        .file-drop-area {
+            background: #0f172a;
+            border-color: #334155;
+        }
+
+        .file-drop-icon {
+            background: #334155;
+            color: #60a5fa;
+        }
+
+        .browse-btn {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        }
+
+        .file-info {
+            background: #1e3a5f;
+            border-color: #10b981;
+        }
+
+        .file-icon {
+            background: #334155;
+            color: #34d399;
+        }
+
+        .toggle-label {
+            background: #0f172a;
+            border-color: #334155;
+        }
+
+        .form-control {
+            background: #0f172a;
+            border-color: #334155;
+            color: #f8fafc;
+        }
+
+        .form-control:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .toggle-switch {
+            background: #475569;
+        }
+
+        .optional-badge {
+            background: #334155;
+            color: #cbd5e1;
+        }
+    }
+</style>
+
+<script>
+    // Toggle advanced section
+    function toggleAdvancedSection() {
+        const section = document.getElementById('advancedSection');
+        const arrow = document.querySelector('.toggle-arrow i');
+        const header = document.getElementById('advancedToggle');
+        
+        const isExpanded = section.classList.toggle('expanded');
+        section.setAttribute('aria-hidden', !isExpanded);
+        header.setAttribute('aria-expanded', isExpanded);
+        
+        arrow.style.transform = isExpanded ? 'rotate(180deg)' : 'rotate(0)';
+    }
+
+    // Show/hide template name section
+    document.getElementById('saveTemplate').addEventListener('change', function() {
+        const templateSection = document.getElementById('templateNameSection');
+        templateSection.style.display = this.checked ? 'block' : 'none';
+    });
+
+    // File handling functions
+    function handleFileSelect(inputId, fileNameId, fileSizeId, fileInfoId) {
+        const input = document.getElementById(inputId);
+        const fileName = document.getElementById(fileNameId);
+        const fileSize = document.getElementById(fileSizeId);
+        const fileInfo = document.getElementById(fileInfoId);
+        
+        if (input.files.length > 0) {
+            const file = input.files[0];
+            fileName.textContent = file.name;
+            fileSize.textContent = formatFileSize(file.size);
+            fileInfo.style.display = 'block';
+        } else {
+            fileInfo.style.display = 'none';
+        }
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
+    // Specific file handlers
+    document.getElementById('mainCsvInput').addEventListener('change', function() {
+        handleFileSelect('mainCsvInput', 'mainCsvFileName', 'mainCsvFileSize', 'mainCsvFileInfo');
+    });
+
+    document.getElementById('serviceCsvInput').addEventListener('change', function() {
+        handleFileSelect('serviceCsvInput', 'serviceCsvFileName', 'serviceCsvFileSize', 'serviceCsvFileInfo');
+    });
+
+    document.getElementById('claimsCsvInput').addEventListener('change', function() {
+        handleFileSelect('claimsCsvInput', 'claimsCsvFileName', 'claimsCsvFileSize', 'claimsCsvFileInfo');
+    });
+
+    document.getElementById('logoInput').addEventListener('change', function() {
+        handleFileSelect('logoInput', 'logoFileName', 'logoFileSize', 'logoFileInfo');
+    });
+
+    // Clear file functions
+    function clearMainCsvFile() {
+        document.getElementById('mainCsvInput').value = '';
+        document.getElementById('mainCsvFileInfo').style.display = 'none';
+    }
+
+    function clearServiceCsvFile() {
+        document.getElementById('serviceCsvInput').value = '';
+        document.getElementById('serviceCsvFileInfo').style.display = 'none';
+    }
+
+    function clearClaimsCsvFile() {
+        document.getElementById('claimsCsvInput').value = '';
+        document.getElementById('claimsCsvFileInfo').style.display = 'none';
+    }
+
+    function clearLogoFile() {
+        document.getElementById('logoInput').value = '';
+        document.getElementById('logoFileInfo').style.display = 'none';
+    }
+
+    // Initialize drag and drop
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropArea = document.getElementById('mainCsvDropArea');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight() {
+            dropArea.classList.add('dragover');
+        }
+
+        function unhighlight() {
+            dropArea.classList.remove('dragover');
+        }
+
+        dropArea.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                const input = document.getElementById('mainCsvInput');
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(files[0]);
+                input.files = dataTransfer.files;
+                
+                // Trigger change event
+                const event = new Event('change', { bubbles: true });
+                input.dispatchEvent(event);
+            }
+        }
+    });
+</script>

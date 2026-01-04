@@ -1,0 +1,2 @@
+date,total_appointments,completed_visits,cancelled_visits,consultation_revenue_usd,procedures_revenue_usd,lab_tests_revenue_usd
+2024-01-01,10,8,2,1000.00,500.00,200.00
