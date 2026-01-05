@@ -22,15 +22,13 @@ def send_email(to_email: str, subject: str, body: str, pdf_path: str) -> bool:
     print('='*60)
     
     # Get credentials from environment
-    sender_email = os.getenv("EMAIL_SENDER", "")
-    sender_password = os.getenv("EMAIL_PASSWORD", "")
+    sender_email = os.environ.get("EMAIL_SENDER")
+    sender_password = os.environ.get("EMAIL_PASSWORD")
     
     if not sender_email or not sender_password:
         print("❌ Email credentials not found in environment variables")
-        print("   Set EMAIL_SENDER and EMAIL_PASSWORD in .env file")
         return False
     
-    # Clean password (remove any spaces)
     sender_password = str(sender_password).replace(" ", "")
     
     print(f"From: {sender_email}")
