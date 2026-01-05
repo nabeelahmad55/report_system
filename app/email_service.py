@@ -5,7 +5,11 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
-from datetime import datetime
+from datetime import datetime  # ✅ Make sure this line exists
+
+# ✅ ADD THESE 2 LINES
+from dotenv import load_dotenv
+load_dotenv()  # This loads the .env file
 
 def send_email(to_email: str, subject: str, body: str, pdf_path: str) -> bool:
     """

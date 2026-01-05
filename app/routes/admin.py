@@ -1,3 +1,4 @@
+
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
@@ -14,9 +15,16 @@ def admin_dashboard(request: Request, username: str = Depends(auth.verify_admin)
     db = database.SessionLocal()
     try:
         reports = db.query(models.Report).order_by(models.Report.created_at.desc()).all()
+        reports_count = len(reports)  # Calculate total count
+        
         return templates.TemplateResponse(
             "admin_dashboard.html",
-            {"request": request, "reports": reports, "username": username}
+            {
+                "request": request, 
+                "reports": reports, 
+                "reports_count": reports_count,  # Pass the count to template
+                "username": username
+            }
         )
     except Exception as e:
         # If error, show simple page
