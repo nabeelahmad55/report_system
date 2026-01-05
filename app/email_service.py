@@ -9,7 +9,8 @@ from datetime import datetime  # ✅ Make sure this line exists
 
 # ✅ ADD THESE 2 LINES
 from dotenv import load_dotenv
-load_dotenv()  # This loads the .env file
+if os.environ.get("ENV") != "PRODUCTION":
+    load_dotenv()
 
 def send_email(to_email: str, subject: str, body: str, pdf_path: str) -> bool:
     """

@@ -7,7 +7,8 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 # Load environment variables from .env file
-load_dotenv()
+if os.environ.get("ENV") != "PRODUCTION":
+    load_dotenv()
 
 # Create necessary directories
 BASE_DIR = Path(__file__).parent
