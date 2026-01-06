@@ -15,6 +15,12 @@ import os
 import math
 from pathlib import Path
 
+from app.dynamic_csv_handler import DynamicCSVHandler
+from app.dynamic_pdf_generator import DynamicPDFGenerator
+from app.email_service import send_email
+from app.database import SessionLocal
+from app.models import Report
+
 # Get the base directory
 BASE_DIR = Path(__file__).parent.parent
 UPLOADS_DIR = BASE_DIR / "uploads"
@@ -34,6 +40,132 @@ Path("uploads").mkdir(exist_ok=True)
 Path("generated_pdfs").mkdir(exist_ok=True)
 Path("uploads/logos").mkdir(exist_ok=True)
 Path("uploads/templates").mkdir(exist_ok=True)
+
+@router.get("/upload/dynamic", response_class=HTMLResponse)
+async def dynamic_upload_page(request: Request):
+    """Serve dynamic CSV upload page"""
+    return HTMLResponse(content=open("app/templates/dynamic_upload.html").read())
+
+@router.post("/upload/dynamic")
+async def upload_dynamic_csv(
+    csv_file: UploadFile = File(...),
+    client_name: str = Form(...),
+    client_email: str = Form(...),
+    report_title: str = Form("Data Report"),
+    include_analysis: bool = Form(True),
+    include_charts: bool = Form(True)
+):
+    """Process any CSV file and generate PDF"""
+    
+    try:
+        # Generate unique IDs
+        file_id = str(uuid.uuid4())[:8]
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        
+        # Save uploaded file
+        safe_filename = f"{file_id}_{csv_file.filename.replace(' ', '_')}"
+        csv_path = UPLOADS_DIR / safe_filename
+        
+        with open(csv_path, "wb") as buffer:
+            shutil.copyfileobj(csv_file.file, buffer)
+        
+        print(f"[Dynamic] Processing: {csv_file.filename}")
+        
+        # Process CSV
+        data = DynamicCSVHandler.read_any_csv(str(csv_path))
+        analysis = DynamicCSVHandler.analyze_csv_structure(data)
+        summary = DynamicCSVHandler.generate_summary_stats(data)
+        
+        # Prepare data for PDF
+        data_dict = {
+            "data": data,
+            "analysis": analysis,
+            "summary": summary
+        }
+        
+        # Generate PDF
+        pdf_generator = DynamicPDFGenerator()
+        
+        pdf_filename = f"dynamic_{client_name}_{timestamp}.pdf".replace(" ", "_")
+        pdf_path = GENERATED_PDFS_DIR / pdf_filename
+        
+        pdf_generator.generate_full_pdf(
+            data_dict,
+            str(pdf_path),
+            report_title=report_title,
+            client_name=client_name,
+            include_analysis=include_analysis
+        )
+        
+        # Send email
+        email_subject = f"📊 PDF Report: {report_title}"
+        email_body = f"""
+        Hello {client_name},
+
+        Your CSV data has been converted to a professional PDF report.
+
+        Report Details:
+        - Title: {report_title}
+        - File: {csv_file.filename}
+        - Records: {len(data):,}
+        - Columns: {analysis.get('total_columns', 0)}
+        - Generated: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+
+        The PDF is attached to this email.
+
+        Thank you for using our CSV to PDF service.
+        """
+        
+        email_sent = send_email(
+            client_email,
+            email_subject,
+            email_body,
+            str(pdf_path)
+        )
+        
+        # Save to database
+        db = SessionLocal()
+        report = Report(
+            filename=pdf_filename,
+            original_filename=csv_file.filename,
+            client_name=client_name,
+            client_email=client_email,
+            pdf_path=str(pdf_path),
+            status="completed" if email_sent else "pending",
+            completed_at=datetime.utcnow(),
+            download_link=f"/generated_pdfs/{pdf_filename}",
+            email_status="sent" if email_sent else "failed",
+            total_appointments=len(data),
+            total_revenue=0,
+            report_period=datetime.now().strftime("%B %Y"),
+            include_insights=include_analysis,
+            notes=f"Dynamic CSV: {csv_file.filename} | Charts: {include_charts}"
+        )
+        db.add(report)
+        db.commit()
+        db.refresh(report)
+        db.close()
+        
+        # Clean up CSV file
+        if os.path.exists(csv_path):
+            os.remove(csv_path)
+        
+        return JSONResponse({
+            "success": True,
+            "message": "PDF generated and sent successfully",
+            "report_id": report.id,
+            "filename": pdf_filename,
+            "download_url": f"/generated_pdfs/{pdf_filename}",
+            "stats": {
+                "records": len(data),
+                "columns": analysis.get("total_columns", 0),
+                "email_sent": email_sent
+            }
+        })
+        
+    except Exception as e:
+        print(f"[Dynamic] Error: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error processing CSV: {str(e)}")
 
 # Simple session storage (in production use redis/database)
 sessions = {}

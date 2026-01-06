@@ -97,10 +97,9 @@
 
 # if __name__ == "__main__":
 #     import uvicorn
-#     uvicorn.run(app, host="127.0.0.1", port=8000, reload=True)
+#     uvicorn.run(app, host="127.0.0.1", port=9000, reload=True)
 
 
-# app/main.py
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -108,27 +107,47 @@ from app.database import Base, engine
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+from app.routes import admin_dynamic
 
 # Load environment variables
 load_dotenv()
 
-# Create necessary directories
-BASE_DIR = Path(__file__).parent
-UPLOADS_DIR = BASE_DIR / "uploads"
-GENERATED_PDFS_DIR = BASE_DIR / "generated_pdfs"
-TEMPLATES_DIR = BASE_DIR / "templates"
+# IMPORTANT: Check if running on Vercel
+IS_VERCEL = os.environ.get("VERCEL") == "1"
 
-# Create directories if they don't exist
-UPLOADS_DIR.mkdir(exist_ok=True)
-GENERATED_PDFS_DIR.mkdir(exist_ok=True)
-(UPLOADS_DIR / "logos").mkdir(exist_ok=True)
-(UPLOADS_DIR / "templates").mkdir(exist_ok=True)
+# Create necessary directories - ONLY in local development
+if not IS_VERCEL:
+    BASE_DIR = Path(__file__).parent
+    UPLOADS_DIR = BASE_DIR / "uploads"
+    GENERATED_PDFS_DIR = BASE_DIR / "generated_pdfs"
+    
+    # Create directories if they don't exist
+    UPLOADS_DIR.mkdir(exist_ok=True)
+    GENERATED_PDFS_DIR.mkdir(exist_ok=True)
+    (UPLOADS_DIR / "logos").mkdir(exist_ok=True)
+    (UPLOADS_DIR / "templates").mkdir(exist_ok=True)
+    
+    print(f"✅ Running locally - Directories created")
+else:
+    # On Vercel, use /tmp for temporary storage
+    BASE_DIR = Path("/tmp")
+    UPLOADS_DIR = BASE_DIR / "uploads"
+    GENERATED_PDFS_DIR = BASE_DIR / "generated_pdfs"
+    
+    print(f"🚀 Running on Vercel - Using /tmp storage")
 
 # Import models to register them with Base
 from app import models
 
-# Create tables
-Base.metadata.create_all(bind=engine)
+# IMPORTANT: Only create tables in non-Vercel environments or with proper DB
+if not IS_VERCEL:
+    try:
+        Base.metadata.create_all(bind=engine)
+        print("✅ Database tables created")
+    except Exception as e:
+        print(f"⚠️ Database error: {e}")
+else:
+    print("ℹ️ Skipping SQLite table creation on Vercel")
 
 app = FastAPI(
     title="CSV to PDF Report Automation",
@@ -145,13 +164,34 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files
-app.mount("/generated_pdfs", StaticFiles(directory="app/generated_pdfs"), name="generated_pdfs")
+# Mount static files - IMPORTANT FIX for Vercel
+# Use absolute path and check if directory exists
+static_dir = str(GENERATED_PDFS_DIR)
+if os.path.exists(static_dir):
+    app.mount("/generated_pdfs", StaticFiles(directory=static_dir), name="generated_pdfs")
+else:
+    print(f"⚠️ Static directory not found: {static_dir}")
+    # Create it if it doesn't exist (for Vercel)
+    Path(static_dir).mkdir(exist_ok=True)
+    app.mount("/generated_pdfs", StaticFiles(directory=static_dir), name="generated_pdfs")
 
 # Import and include routers
-from app.routes import admin, reports
-app.include_router(admin.router)
-app.include_router(reports.router)
+try:
+    from app.routes import admin, reports,admin_dynamic
+    app.include_router(admin.router)
+    app.include_router(reports.router)
+    app.include_router(admin_dynamic.router)
+    print("✅ Routers loaded successfully")
+except ImportError as e:
+    print(f"❌ Router import error: {e}")
+    # Create placeholder endpoints if routers fail
+    @app.get("/admin")
+    def admin_placeholder():
+        return {"message": "Admin module not available"}
+    
+    @app.get("/reports")
+    def reports_placeholder():
+        return {"message": "Reports module not available"}
 
 @app.get("/")
 def home():
@@ -159,11 +199,25 @@ def home():
         "message": "CSV to PDF Report System",
         "status": "running",
         "version": "1.0",
-        "api_docs": "/docs",
-        "redoc": "/redoc"
+        "environment": "Vercel" if IS_VERCEL else "Local",
+        "api_docs": "/docs"
     }
 
-# For Vercel serverless
+@app.get("/debug/routes")
+def debug_routes():
+    """Show all registered routes"""
+    routes = []
+    for route in app.routes:
+        routes.append({
+            "path": route.path,
+            "name": route.name,
+            "methods": list(route.methods) if hasattr(route, 'methods') else []
+        })
+    return {"routes": sorted(routes, key=lambda x: x["path"])}    
+
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+    # Use different ports for local development
+    port = int(os.getenv("PORT", 9000))
+    host = os.getenv("HOST", "127.0.0.1")

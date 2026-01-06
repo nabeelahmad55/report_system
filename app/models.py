@@ -69,3 +69,20 @@ class ReportTemplate(Base):
     # Template metadata
     report_period_format = Column(String(50), default="auto")
     color_scheme = Column(String(20), default="professional")
+
+class DynamicCSVTemplate(Base):
+    __tablename__ = "dynamic_csv_templates"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    template_name = Column(String(100))
+    description = Column(Text, nullable=True)
+    
+    # CSV to PDF mapping configuration
+    column_mappings = Column(Text)  # JSON: {"csv_column": "pdf_field"}
+    pdf_fields_config = Column(Text)  # JSON: Fields to show in PDF
+    template_html = Column(Text)  # Custom HTML template for this format
+    
+    # Usage tracking
+    usage_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_used = Column(DateTime, nullable=True)

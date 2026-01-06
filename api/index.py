@@ -1,13 +1,15 @@
-# api/index.py - This is Vercel's entry point
+# api/index.py - Vercel entry point
 import sys
 import os
+from pathlib import Path
 
-# Add app to path
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+# Add the project root to Python path
+current_dir = Path(__file__).parent
+project_root = current_dir.parent
+sys.path.insert(0, str(project_root))
 
+# Import the FastAPI app
 from app.main import app
 
-# This is required for Vercel serverless
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=int(os.getenv("PORT", 8000)))
+# Vercel requires this to be named 'app'
+application = app
